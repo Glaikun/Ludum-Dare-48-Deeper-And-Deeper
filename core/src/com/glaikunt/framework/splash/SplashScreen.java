@@ -13,7 +13,7 @@ import com.glaikunt.framework.game.GameScreen;
 public class SplashScreen extends Screen {
 
     private AnimationComponent animation;
-    private TickTimer nextLevel = new TickTimer(6);
+    private TickTimer nextLevel = new TickTimer(3);
 
     public SplashScreen(ApplicationResources applicationResources) {
         super(applicationResources);
@@ -31,6 +31,11 @@ public class SplashScreen extends Screen {
         getEngine().addEntity(entity);
 
         getEngine().addSystem(new AnimationSystem(getEngine()));
+    }
+
+    @Override
+    public void hide() {
+        super.hide();
     }
 
     @Override

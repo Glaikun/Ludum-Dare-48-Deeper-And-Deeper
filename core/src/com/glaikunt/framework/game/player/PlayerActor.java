@@ -11,6 +11,7 @@ import com.glaikunt.framework.esc.component.common.HealthComponent;
 import com.glaikunt.framework.esc.component.common.PositionComponent;
 import com.glaikunt.framework.esc.component.common.SizeComponent;
 import com.glaikunt.framework.esc.component.common.VelocityComponent;
+import com.glaikunt.framework.esc.component.player.AttackComponent;
 import com.glaikunt.framework.esc.component.player.PlayerComponent;
 import com.glaikunt.framework.esc.component.player.WeaponComponent;
 import com.glaikunt.framework.game.weapon.WeaponType;
@@ -29,8 +30,8 @@ public class PlayerActor extends Actor {
         this.size = new SizeComponent(playerTexture.getWidth() * 2, playerTexture.getHeight() * 2);
         this.pos = new PositionComponent((Display.WORLD_WIDTH/2) - (getWidth()*3), (Display.WORLD_HEIGHT/2) - (getHeight()/2));
 
-        WeaponComponent weapon = new WeaponComponent();
-        weapon.setWeaponType(WeaponType.MELEE);
+        this.weapon = new WeaponComponent();
+        this.weapon.setWeaponType(WeaponType.MELEE);
 
         Entity entity = new Entity();
 
@@ -39,6 +40,7 @@ public class PlayerActor extends Actor {
         entity.add(new HealthComponent());
         entity.add(new VelocityComponent(100, 100));
         entity.add(new PlayerComponent());
+        entity.add(new AttackComponent());
         entity.add(weapon);
         getApplicationResources().getEngine().addEntity(entity);
     }

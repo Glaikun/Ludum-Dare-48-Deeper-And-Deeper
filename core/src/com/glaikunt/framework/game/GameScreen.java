@@ -17,6 +17,7 @@ import com.glaikunt.framework.esc.system.AttackSystem;
 import com.glaikunt.framework.esc.system.PlayerActionsSystem;
 import com.glaikunt.framework.esc.system.PlayerMovementSystem;
 import com.glaikunt.framework.game.enemy.DemonActor;
+import com.glaikunt.framework.game.player.OldPlayerActor;
 import com.glaikunt.framework.game.player.PlayerActor;
 import com.glaikunt.framework.splash.SplashScreen;
 
@@ -36,16 +37,27 @@ public class GameScreen extends Screen {
     @Override
     public void show() {
 
-        this.level = new LevelComponent();
-        getApplicationResources().getGlobalEntity().add(level);
 
+        this.level = getApplicationResources().getGlobalEntity().getComponent(LevelComponent.class);
         this.player = new PlayerActor(getApplicationResources());
         getFront().addActor(player);
         getFront().addActor(new DemonActor(getApplicationResources()));
 
+        for (GhostPlayerComponent ghostPlayerComponent : level.getGhostPlayers()) {
+            getFront().addActor(new OldPlayerActor(getApplicationResources(), ghostPlayerComponent.getPos(), ghostPlayerComponent.getWeapon()));
+        }
+
         getEngine().addSystem(new PlayerActionsSystem(getApplicationResources()));
         getEngine().addSystem(new PlayerMovementSystem(getApplicationResources()));
         getEngine().addSystem(new AttackSystem(getApplicationResources()));
+    }
+
+    @Override
+    public void hide() {
+        super.hide();
+
+        this.level.setLevelComplete(false);
+        this.level.setLevelStarted(false);
     }
 
     @Override
@@ -64,7 +76,7 @@ public class GameScreen extends Screen {
             GhostPlayerComponent ghostPlayer = new GhostPlayerComponent();
 
             ghostPlayer.setPos(new PositionComponent(player.getX(), player.getY()));
-            ghostPlayer.setWeapon(ghostPlayer.getWeapon());
+            ghostPlayer.setWeapon(player.getWeapon().getWeaponType());
 
             level.getGhostPlayers().add(ghostPlayer);
 

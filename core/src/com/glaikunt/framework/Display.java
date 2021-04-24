@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.glaikunt.framework.application.ApplicationResources;
 import com.glaikunt.framework.application.Screen;
+import com.glaikunt.framework.esc.component.game.LevelComponent;
 import com.glaikunt.framework.game.GameScreen;
 import com.glaikunt.framework.splash.SplashScreen;
 
@@ -39,8 +40,11 @@ public class Display extends Game {
 			applicationResources.getCacheRetriever().update();
 		}
 
-//		setScreen(new GameScreen(getApplicationResources()));
-		setScreen(new SplashScreen(getApplicationResources()));
+		LevelComponent level = new LevelComponent();
+		getApplicationResources().getGlobalEntity().add(level);
+
+		setScreen(new GameScreen(getApplicationResources()));
+//		setScreen(new SplashScreen(getApplicationResources()));
 	}
 
 	@Override

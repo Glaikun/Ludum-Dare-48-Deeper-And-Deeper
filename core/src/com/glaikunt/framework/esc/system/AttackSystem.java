@@ -10,6 +10,7 @@ import com.glaikunt.framework.application.ApplicationResources;
 import com.glaikunt.framework.esc.component.common.HealthComponent;
 import com.glaikunt.framework.esc.component.demon.DemonComponent;
 import com.glaikunt.framework.esc.component.game.LevelComponent;
+import com.glaikunt.framework.esc.component.player.AttackComponent;
 import com.glaikunt.framework.esc.component.player.PlayerComponent;
 import com.glaikunt.framework.esc.component.player.WeaponComponent;
 
@@ -19,7 +20,7 @@ public class AttackSystem extends EntitySystem {
 
     private LevelComponent level;
 
-    private ComponentMapper<PlayerComponent> playerCM = ComponentMapper.getFor(PlayerComponent.class);
+    private ComponentMapper<AttackComponent> attackCM = ComponentMapper.getFor(AttackComponent.class);
     private ComponentMapper<WeaponComponent> weaponCM = ComponentMapper.getFor(WeaponComponent.class);
 
     private ComponentMapper<DemonComponent> demonCM = ComponentMapper.getFor(DemonComponent.class);
@@ -29,7 +30,7 @@ public class AttackSystem extends EntitySystem {
     public AttackSystem(ApplicationResources applicationResources) {
 
         this.playerEntities = applicationResources.getEngine().getEntitiesFor(Family.all(
-                PlayerComponent.class,
+                AttackComponent.class,
                 WeaponComponent.class
         ).get());
         this.enemyEntities = applicationResources.getEngine().getEntitiesFor(Family.all(
@@ -49,7 +50,7 @@ public class AttackSystem extends EntitySystem {
         for (int pe = 0; pe < playerEntities.size(); ++pe) {
 
             Entity playerEntity = playerEntities.get(pe);
-            PlayerComponent player = playerCM.get(playerEntity);
+            AttackComponent player = attackCM.get(playerEntity);
             WeaponComponent weapon = weaponCM.get(playerEntity);
 
             weapon.getWeaponType().getAttackSpeed().tick(delta);
@@ -70,6 +71,7 @@ public class AttackSystem extends EntitySystem {
 
                 if (demonHealth.getLerpWidth() <= 0 && MathUtils.isEqual(demonHealth.getLerpWidth(), demonHealth.getDeltaHealth(), 1) ) {
                     level.setLevelComplete(true);
+                    return;
                 }
             }
         }
