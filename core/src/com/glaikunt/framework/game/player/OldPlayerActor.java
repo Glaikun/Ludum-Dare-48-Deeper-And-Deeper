@@ -42,7 +42,9 @@ public class OldPlayerActor extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
 
+        batch.setColor(1, 1, 1, .5f);
         batch.draw(playerTexture, getX(), getY(), getWidth(), getHeight());
+        batch.setColor(1, 1, 1, 1f);
     }
 
 }

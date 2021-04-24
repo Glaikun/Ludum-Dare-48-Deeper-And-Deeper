@@ -31,7 +31,7 @@ public abstract class Screen implements com.badlogic.gdx.Screen {
         this.applicationResources = applicationResources;
         this.front = new Stage(new ScalingViewport(Scaling.stretch, WORLD_WIDTH, WORLD_HEIGHT));
         ((OrthographicCamera) this.front.getCamera()).setToOrtho(false);
-        this.front.setDebugAll(true);
+        this.front.setDebugAll(false);
         this.background = new Stage(new ScalingViewport(Scaling.stretch, WORLD_WIDTH, WORLD_HEIGHT));
         ((OrthographicCamera) this.background.getCamera()).setToOrtho(false);
         this.ux = new Stage(new ScalingViewport(Scaling.stretch, WORLD_WIDTH, WORLD_HEIGHT));

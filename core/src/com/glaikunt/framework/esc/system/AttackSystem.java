@@ -11,7 +11,6 @@ import com.glaikunt.framework.esc.component.common.HealthComponent;
 import com.glaikunt.framework.esc.component.demon.DemonComponent;
 import com.glaikunt.framework.esc.component.game.LevelComponent;
 import com.glaikunt.framework.esc.component.player.AttackComponent;
-import com.glaikunt.framework.esc.component.player.PlayerComponent;
 import com.glaikunt.framework.esc.component.player.WeaponComponent;
 
 public class AttackSystem extends EntitySystem {
@@ -63,6 +62,7 @@ public class AttackSystem extends EntitySystem {
 
                 if (demonHealth.getLerpWidth() > 0 && weapon.getWeaponType().getAttackSpeed().isTimerEventReady()) {
                     demonHealth.setLerpWidth(demonHealth.getLerpWidth() - weapon.getWeaponType().getDamage());
+                    demon.getHitDmg().add((int) (weapon.getWeaponType().getDamage() * 10));
                 }
 
                 if (MathUtils.isEqual(demonHealth.getLerpWidth(), demonHealth.getDeltaHealth(), 1)) {

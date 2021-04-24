@@ -8,12 +8,17 @@ import java.util.Map;
 
 public class FontCache implements Cache {
 
+    public static final String SMALL_FONT = "font/button_font.fnt";
+    public static final String BATTLE_FONT = "font/battle_font.fnt";
+
     private Map<String, BitmapFont> fonts = new HashMap<>();
     private boolean loaded = false;
 
     @Override
     public void loadCache(AssetManager assetManager) {
 
+        add(SMALL_FONT, assetManager);
+        add(BATTLE_FONT, assetManager);
     }
 
     private void add(String filePath, AssetManager assetManager) {
