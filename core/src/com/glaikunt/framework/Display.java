@@ -12,11 +12,12 @@ import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeIn;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeOut;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.run;
 import static com.badlogic.gdx.utils.Logger.DEBUG;
+import static com.badlogic.gdx.utils.Logger.NONE;
 
 public class Display extends Game {
 
-	public static final float WORLD_WIDTH = 800; //640 //160 //320
-	public static final float WORLD_HEIGHT = 600; //480 //120 //240
+	public static final float WORLD_WIDTH = 640; //640 //160 //320
+	public static final float WORLD_HEIGHT = 480; //480 //120 //240
 	public static final String VERSION = "v0.1.0";
 
     private ApplicationResources applicationResources;
@@ -26,9 +27,16 @@ public class Display extends Game {
 	@Override
 	public void create () {
 
-		Gdx.app.setLogLevel(DEBUG);
+//		Gdx.app.setLogLevel(DEBUG);
+		Gdx.app.setLogLevel(NONE);
 
 		this.applicationResources = new ApplicationResources(this);
+
+		this.applicationResources.getCacheRetriever().loadCache();
+
+		while(!applicationResources.getCacheRetriever().isCacheLoaded()) {
+			applicationResources.getCacheRetriever().update();
+		}
 
 		setScreen(new GameScreen(getApplicationResources()));
 	}

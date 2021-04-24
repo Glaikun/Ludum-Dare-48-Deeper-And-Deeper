@@ -9,9 +9,9 @@ public class DesktopLauncher {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		//		config.width = (int) (1440 * .9f);
 //		config.height = (int) (900 * .9f);
-		config.width = 800;
-		config.height = 600;
-		config.title = "Libgdx Framework";
+		config.width = 640;
+		config.height = 480;
+		config.title = "Ludum Dare 48";
 		config.resizable = false;
 		new LwjglApplication(new Display(), config);
 	}

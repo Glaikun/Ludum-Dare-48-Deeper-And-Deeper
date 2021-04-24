@@ -11,6 +11,8 @@ import java.util.Map;
 
 public class TiledCache implements Cache {
 
+    public static final String MAP = "tile/map.tmx";
+
     private Map<String, TiledMap> tiledMap = new HashMap<>();
     private boolean loaded = false;
 
@@ -23,6 +25,9 @@ public class TiledCache implements Cache {
 
         TmxMapLoader loader = new TmxMapLoader(new InternalFileHandleResolver());
         assetManager.setLoader(TiledMap.class, loader);
+
+        assetManager.load(MAP, TiledMap.class, params);
+        getTiledMap().put(MAP, null);
     }
 
     @Override

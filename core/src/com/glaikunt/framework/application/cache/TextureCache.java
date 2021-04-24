@@ -8,12 +8,15 @@ import java.util.Map;
 
 public class TextureCache implements Cache {
 
+    public static final String PLAYER = "sprites/player.png";
+
     private Map<String, Texture> textureMap = new HashMap<>();
     private boolean loaded = false;
 
     @Override
     public void loadCache(AssetManager assetManager) {
 
+        add(assetManager, PLAYER);
     }
 
     @Override
