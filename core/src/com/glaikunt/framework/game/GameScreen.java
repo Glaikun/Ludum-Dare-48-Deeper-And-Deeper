@@ -13,6 +13,7 @@ import com.glaikunt.framework.application.cache.TiledCache;
 import com.glaikunt.framework.esc.component.common.PositionComponent;
 import com.glaikunt.framework.esc.component.game.LevelComponent;
 import com.glaikunt.framework.esc.component.player.GhostPlayerComponent;
+import com.glaikunt.framework.esc.system.AnimationSystem;
 import com.glaikunt.framework.esc.system.AttackSystem;
 import com.glaikunt.framework.esc.system.PlayerActionsSystem;
 import com.glaikunt.framework.esc.system.PlayerMovementSystem;
@@ -50,6 +51,7 @@ public class GameScreen extends Screen {
         getEngine().addSystem(new PlayerActionsSystem(getApplicationResources()));
         getEngine().addSystem(new PlayerMovementSystem(getApplicationResources()));
         getEngine().addSystem(new AttackSystem(getApplicationResources()));
+        getEngine().addSystem(new AnimationSystem(getEngine()));
     }
 
     @Override

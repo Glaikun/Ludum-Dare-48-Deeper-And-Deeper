@@ -29,11 +29,12 @@ public class AttackSystem extends EntitySystem {
     public AttackSystem(ApplicationResources applicationResources) {
 
         this.playerEntities = applicationResources.getEngine().getEntitiesFor(Family.all(
-                AttackComponent.class,
-                WeaponComponent.class
+                WeaponComponent.class,
+                HealthComponent.class
         ).get());
         this.enemyEntities = applicationResources.getEngine().getEntitiesFor(Family.all(
                 DemonComponent.class,
+                AttackComponent.class,
                 HealthComponent.class
         ).get());
         this.level = applicationResources.getGlobalEntity().getComponent(LevelComponent.class);
@@ -49,24 +50,39 @@ public class AttackSystem extends EntitySystem {
         for (int pe = 0; pe < playerEntities.size(); ++pe) {
 
             Entity playerEntity = playerEntities.get(pe);
-            AttackComponent player = attackCM.get(playerEntity);
-            WeaponComponent weapon = weaponCM.get(playerEntity);
+            WeaponComponent playerWeapon = weaponCM.get(playerEntity);
+            HealthComponent playerHealth = healthCM.get(playerEntity);
 
-            weapon.getWeaponType().getAttackSpeed().tick(delta);
+            playerWeapon.getWeaponType().getAttackSpeed().tick(delta);
 
             for (int ee = 0; ee < enemyEntities.size(); ++ee) {
 
                 Entity enemyEntity = enemyEntities.get(ee);
                 DemonComponent demon = demonCM.get(enemyEntity);
                 HealthComponent demonHealth = healthCM.get(enemyEntity);
+                AttackComponent demonAttack = attackCM.get(enemyEntity);
 
-                if (demonHealth.getLerpWidth() > 0 && weapon.getWeaponType().getAttackSpeed().isTimerEventReady()) {
-                    demonHealth.setLerpWidth(demonHealth.getLerpWidth() - weapon.getWeaponType().getDamage());
-                    demon.getHitDmg().add((int) (weapon.getWeaponType().getDamage() * 10));
+                demonAttack.getAttackSpeed().tick(delta);
+
+                if (demonHealth.getLerpWidth() > 0 && playerWeapon.getWeaponType().getAttackSpeed().isTimerEventReady()) {
+                    demonHealth.setLerpWidth(demonHealth.getLerpWidth() - playerWeapon.getWeaponType().getDamage());
+                    demon.getHitDmg().add((int) (playerWeapon.getWeaponType().getDamage() * 10));
                 }
 
-                if (MathUtils.isEqual(demonHealth.getLerpWidth(), demonHealth.getDeltaHealth(), 1)) {
+                if (!MathUtils.isEqual(demonHealth.getLerpWidth(), demonHealth.getDeltaHealth(), .5f)) {
                     demonHealth.setDeltaHealth(MathUtils.lerp(demonHealth.getDeltaHealth(), demonHealth.getLerpWidth(), 5 * delta));
+                }else if (demonHealth.getLerpWidth() != demonHealth.getDeltaHealth()) {
+                    demonHealth.setDeltaHealth(demonHealth.getLerpWidth());
+                }
+
+                if (playerHealth.getLerpWidth() > 0 && demonAttack.getAttackSpeed().isTimerEventReady()) {
+                    playerHealth.setLerpWidth(playerHealth.getLerpWidth() - demonAttack.getDmg());
+                }
+
+                if (!MathUtils.isEqual(playerHealth.getLerpWidth(), playerHealth.getDeltaHealth(), .5f)) {
+                    playerHealth.setDeltaHealth(MathUtils.lerp(playerHealth.getDeltaHealth(), playerHealth.getLerpWidth(), 5 * delta));
+                } else if (playerHealth.getLerpWidth() != playerHealth.getDeltaHealth()) {
+                    playerHealth.setDeltaHealth(playerHealth.getLerpWidth());
                 }
 
                 if (demonHealth.getLerpWidth() <= 0 && MathUtils.isEqual(demonHealth.getLerpWidth(), demonHealth.getDeltaHealth(), 1) ) {

@@ -8,7 +8,10 @@ import java.util.Map;
 
 public class TextureCache implements Cache {
 
-    public static final String PLAYER = "sprites/player.png";
+    public static final String PLAYER_IDLE = "sprites/player_idle.png";
+    public static final String PLAYER_SITTING = "sprites/player_sitting_down.png";
+    public static final String PLAYER_MOVEMENT = "sprites/player_movement.png";
+
     public static final String SPOT = "sprites/spot.png";
     public static final String NEXT_STAGE = "sprites/next_stage.png";
 
@@ -18,7 +21,7 @@ public class TextureCache implements Cache {
     @Override
     public void loadCache(AssetManager assetManager) {
 
-        add(assetManager, PLAYER);
+        add(assetManager, PLAYER_IDLE, PLAYER_SITTING, PLAYER_MOVEMENT);
         add(assetManager, SPOT);
         add(assetManager, NEXT_STAGE);
     }

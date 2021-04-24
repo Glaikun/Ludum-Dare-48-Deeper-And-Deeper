@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -14,22 +15,27 @@ import com.badlogic.gdx.utils.IntMap;
 import com.glaikunt.framework.Display;
 import com.glaikunt.framework.application.Actor;
 import com.glaikunt.framework.application.ApplicationResources;
+import com.glaikunt.framework.application.TickTimer;
 import com.glaikunt.framework.application.cache.FontCache;
 import com.glaikunt.framework.application.cache.TextureCache;
+import com.glaikunt.framework.esc.component.animation.AnimationComponent;
 import com.glaikunt.framework.esc.component.common.HealthComponent;
 import com.glaikunt.framework.esc.component.common.PositionComponent;
 import com.glaikunt.framework.esc.component.common.SizeComponent;
 import com.glaikunt.framework.esc.component.demon.DemonComponent;
+import com.glaikunt.framework.esc.component.player.AttackComponent;
 
 import java.util.Iterator;
 
 public class DemonActor extends Actor {
 
-    private Texture demonTexture, healthBarTexture;
+    private TextureRegion demonTexture;
+    private Texture healthBarTexture;
     private DemonComponent demon;
     private HealthComponent health;
+    private AttackComponent attack;
 
-    private float healthDeltaWidth = 0;
+    private float healthDeltaWidth;
     private float healthMaxWidth;
 
     private Vector2 healthBarPos, healthBarSize, borderSize;
@@ -42,10 +48,10 @@ public class DemonActor extends Actor {
     public DemonActor(ApplicationResources applicationResources) {
         super(applicationResources);
 
-        this.demonTexture = applicationResources.getCacheRetriever().geTextureCache(TextureCache.PLAYER);
+        this.demonTexture = new AnimationComponent(applicationResources.getCacheRetriever().geTextureCache(TextureCache.PLAYER_IDLE), 3, 1).getCurrentAnimation().getKeyFrames()[0];
         this.healthBarTexture = applicationResources.getCacheRetriever().geTextureCache(TextureCache.SPOT);
 
-        this.size = new SizeComponent(demonTexture.getWidth() * 4, demonTexture.getHeight() * 4);
+        this.size = new SizeComponent(demonTexture.getRegionWidth() * 4, demonTexture.getRegionHeight() * 4);
         this.pos = new PositionComponent((Display.WORLD_WIDTH / 2) - (getWidth() / 2), (Display.WORLD_HEIGHT / 2) - (getHeight()));
 
         this.health = new HealthComponent();
@@ -65,12 +71,17 @@ public class DemonActor extends Actor {
         this.hitFont = applicationResources.getCacheRetriever().getFontCache(FontCache.BATTLE_FONT);
         this.hitFont.getRegion().flip(true, false);
 
+        this.attack = new AttackComponent();
+        this.attack.setAttackSpeed(new TickTimer(1));
+        this.attack.setDmg(1);
+
         Entity entity = new Entity();
 
         entity.add(pos);
         entity.add(size);
         entity.add(health);
         entity.add(demon);
+        entity.add(attack);
 
         getApplicationResources().getEngine().addEntity(entity);
     }
@@ -79,7 +90,7 @@ public class DemonActor extends Actor {
     public void draw(Batch batch, float parentAlpha) {
 
         batch.setColor(1, 0, 0, 1f);
-        batch.draw(demonTexture, getX(), getY(), getWidth(), getHeight());
+//        batch.draw(demonTexture, getX(), getY(), getWidth(), getHeight());
         batch.setColor(1, 1, 1, 1f);
 
         batch.setColor(Color.RED);
@@ -118,8 +129,6 @@ public class DemonActor extends Actor {
         if (getStage() != null) {
 
             for (Iterator<Integer> i = demon.getHitDmg().iterator(); i.hasNext(); ) {
-
-
 
                 Label label = new Label(i.next() + "", new Label.LabelStyle(hitFont, Color.WHITE));
                 Container<Label> container = new Container<>(label);

@@ -49,20 +49,32 @@ public class PlayerMovementSystem extends EntitySystem {
             VelocityComponent vel = velCM.get(entity);
             SizeComponent size = sizeCM.get(entity);
 
+            player.setMoving(false);
+
             if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
 
                 pos.x -= vel.x * delta;
+                if (player.isMovingLeft()) {
+                    player.setMovingLeft(false);
+                }
+                player.setMoving(true);
             } else if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
 
                 pos.x += vel.x * delta;
+                if (!player.isMovingLeft()) {
+                    player.setMovingLeft(true);
+                }
+                player.setMoving(true);
             }
 
             if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
 
                 pos.y += vel.y * delta;
+                player.setMoving(true);
             } else if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
 
                 pos.y -= vel.y * delta;
+                player.setMoving(true);
             }
         }
     }
