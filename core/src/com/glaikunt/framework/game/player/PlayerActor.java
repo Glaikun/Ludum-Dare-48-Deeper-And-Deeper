@@ -19,6 +19,8 @@ public class PlayerActor extends Actor {
 
     private Texture playerTexture;
 
+    private WeaponComponent weapon;
+
     public PlayerActor(ApplicationResources applicationResources) {
         super(applicationResources);
 
@@ -45,5 +47,9 @@ public class PlayerActor extends Actor {
     public void draw(Batch batch, float parentAlpha) {
 
         batch.draw(playerTexture, getX(), getY(), getWidth(), getHeight());
+    }
+
+    public WeaponComponent getWeapon() {
+        return weapon;
     }
 }

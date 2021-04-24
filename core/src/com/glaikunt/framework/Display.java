@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.glaikunt.framework.application.ApplicationResources;
 import com.glaikunt.framework.application.Screen;
 import com.glaikunt.framework.game.GameScreen;
+import com.glaikunt.framework.splash.SplashScreen;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeIn;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeOut;
@@ -38,7 +39,8 @@ public class Display extends Game {
 			applicationResources.getCacheRetriever().update();
 		}
 
-		setScreen(new GameScreen(getApplicationResources()));
+//		setScreen(new GameScreen(getApplicationResources()));
+		setScreen(new SplashScreen(getApplicationResources()));
 	}
 
 	@Override
