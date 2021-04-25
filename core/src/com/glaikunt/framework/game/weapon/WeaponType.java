@@ -5,7 +5,7 @@ import com.glaikunt.framework.application.TickTimer;
 public enum WeaponType {
 
     MELEE(.5f, new TickTimer(1f)),
-    RANGED(.5f, new TickTimer(1f)),
+    RANGED(.2f, new TickTimer(1f)),
     SUPPORT(.5f, new TickTimer(1f));
 
     private float damage;

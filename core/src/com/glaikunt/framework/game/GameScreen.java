@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.utils.Sort;
 import com.glaikunt.framework.application.ApplicationResources;
 import com.glaikunt.framework.application.Screen;
@@ -41,9 +42,10 @@ public class GameScreen extends Screen {
 
 
         this.level = getApplicationResources().getGlobalEntity().getComponent(LevelComponent.class);
-        this.player = new PlayerActor(getApplicationResources());
+        DemonActor demon = new DemonActor(getApplicationResources());
+        getFront().addActor(demon);
+        this.player = new PlayerActor(getApplicationResources(), demon);
         getFront().addActor(player);
-        getFront().addActor(new DemonActor(getApplicationResources()));
 
         for (GhostPlayerComponent ghostPlayerComponent : level.getGhostPlayers()) {
             getFront().addActor(new OldPlayerActor(getApplicationResources(), ghostPlayerComponent.getPos(), ghostPlayerComponent.getWeapon()));
@@ -68,6 +70,7 @@ public class GameScreen extends Screen {
     @Override
     public void update(float delta) {
 
+        getApplicationResources().getFrontStageMousePosition().set(getFront().getCamera().unproject(getApplicationResources().getFrontStageMousePosition().set(Gdx.input.getX(), Gdx.input.getY(), 0)));
         mapRenderer.setView((OrthographicCamera) getFront().getCamera());
 
         Sort.instance().sort(getFront().getActors(), new ActorComparator());
@@ -114,6 +117,10 @@ public class GameScreen extends Screen {
     private class ActorComparator implements java.util.Comparator<Actor> {
         @Override
         public int compare(Actor actor1, Actor actor2) {
+            if (actor1 instanceof Container) {
+                return 1;
+            }
+
             if (actor1.getY() < (actor2.getY())) {
                 return 1;
             } else if (actor1.getY() > actor2.getY()) {

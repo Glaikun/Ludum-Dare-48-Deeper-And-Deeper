@@ -39,7 +39,7 @@ public class ChooseWeaponActor extends Actor {
 
         this.animation = new AnimationComponent(getApplicationResources().getCacheRetriever().geTextureCache(TextureCache.NEXT_STAGE), 25, 1);
         this.animation.setPlayMode(Animation.PlayMode.NORMAL);
-        this.animation.setFramerate(.2f);
+        this.animation.setFramerate(.1f);
 
         this.attackIcon = applicationResources.getTexture(TextureCache.ATTACK_ICON);
         this.magicIcon = applicationResources.getTexture(TextureCache.MAGIC_ICON);

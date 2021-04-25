@@ -12,6 +12,8 @@ public class TextureCache implements Cache {
     public static final String PLAYER_SITTING = "sprites/player_sitting_down.png";
     public static final String PLAYER_MOVEMENT = "sprites/player_movement.png";
 
+    public static final String DEMON = "sprites/enemy.png";
+
     public static final String SPOT = "sprites/spot.png";
     public static final String NEXT_STAGE = "sprites/next_stage.png";
 
@@ -41,6 +43,7 @@ public class TextureCache implements Cache {
     public void loadCache(AssetManager assetManager) {
 
         add(assetManager, PLAYER_IDLE, PLAYER_SITTING, PLAYER_MOVEMENT);
+        add(assetManager, DEMON);
         add(assetManager, SPOT);
         add(assetManager, NEXT_STAGE);
         add(assetManager, ATTACK_ICON, MAGIC_ICON, SUPPORT_ICON);
