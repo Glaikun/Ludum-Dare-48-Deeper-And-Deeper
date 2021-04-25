@@ -1,6 +1,8 @@
 package com.glaikunt.framework.splash;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.glaikunt.framework.application.ApplicationResources;
 import com.glaikunt.framework.application.Screen;
@@ -9,6 +11,7 @@ import com.glaikunt.framework.application.cache.TextureCache;
 import com.glaikunt.framework.esc.component.animation.AnimationComponent;
 import com.glaikunt.framework.esc.system.AnimationSystem;
 import com.glaikunt.framework.game.GameScreen;
+import com.glaikunt.framework.ui.OverlayActor;
 
 public class SplashScreen extends Screen {
 
@@ -30,6 +33,8 @@ public class SplashScreen extends Screen {
         entity.add(animation);
         getEngine().addEntity(entity);
 
+        getUX().addActor(new OverlayActor(getApplicationResources()));
+
         getEngine().addSystem(new AnimationSystem(getEngine()));
     }
 
@@ -40,6 +45,10 @@ public class SplashScreen extends Screen {
 
     @Override
     public void update(float delta) {
+
+        getBackground().act();
+        getFront().act();
+        getUX().act();
 
         if (animation.isAnimationFinished()) {
 
@@ -53,11 +62,18 @@ public class SplashScreen extends Screen {
     @Override
     public void render2D(float delta) {
 
+        Gdx.gl.glClearColor(0, 0f, 0f, 1f);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        getBackground().draw();
+        getFront().draw();
         getFront().getBatch().begin();
 
         getFront().getBatch().draw(animation.getCurrentFrame(), 0, 0);
 
         getFront().getBatch().end();
+        getUX().draw();
+
     }
 
     @Override

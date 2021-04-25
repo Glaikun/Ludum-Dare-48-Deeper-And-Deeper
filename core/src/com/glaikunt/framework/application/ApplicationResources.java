@@ -3,6 +3,7 @@ package com.glaikunt.framework.application;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector3;
 import com.glaikunt.framework.Display;
 import com.glaikunt.framework.application.cache.CacheRetriever;
@@ -63,5 +64,9 @@ public class ApplicationResources {
 
     public void dispose() {
         cacheRetriever.dispose();
+    }
+
+    public Texture getTexture(String cacheName) {
+        return getCacheRetriever().geTextureCache(cacheName);
     }
 }

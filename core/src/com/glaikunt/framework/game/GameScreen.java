@@ -20,6 +20,7 @@ import com.glaikunt.framework.esc.system.PlayerMovementSystem;
 import com.glaikunt.framework.game.enemy.DemonActor;
 import com.glaikunt.framework.game.player.OldPlayerActor;
 import com.glaikunt.framework.game.player.PlayerActor;
+import com.glaikunt.framework.ui.OverlayActor;
 import com.glaikunt.framework.splash.SplashScreen;
 
 public class GameScreen extends Screen {
@@ -47,6 +48,8 @@ public class GameScreen extends Screen {
         for (GhostPlayerComponent ghostPlayerComponent : level.getGhostPlayers()) {
             getFront().addActor(new OldPlayerActor(getApplicationResources(), ghostPlayerComponent.getPos(), ghostPlayerComponent.getWeapon()));
         }
+
+        getUX().addActor(new OverlayActor(getApplicationResources()));
 
         getEngine().addSystem(new PlayerActionsSystem(getApplicationResources()));
         getEngine().addSystem(new PlayerMovementSystem(getApplicationResources()));

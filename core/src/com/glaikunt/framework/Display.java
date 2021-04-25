@@ -43,8 +43,8 @@ public class Display extends Game {
 		LevelComponent level = new LevelComponent();
 		getApplicationResources().getGlobalEntity().add(level);
 
-		setScreen(new GameScreen(getApplicationResources()));
-//		setScreen(new SplashScreen(getApplicationResources()));
+//		setScreen(new GameScreen(getApplicationResources()));
+		setScreen(new SplashScreen(getApplicationResources()));
 	}
 
 	@Override

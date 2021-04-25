@@ -25,6 +25,10 @@ public class AnimationComponent implements Component {
         this.playing = animationComponent.playing;
     }
 
+    public AnimationComponent(IntMap<Texture> textures) {
+        setup(textures);
+    }
+
     public AnimationComponent(Texture texture, int cols, int rows, boolean flipx, boolean flipy) {
 
         // Use the split utility method to create a 2D array of TextureRegions. This is
@@ -65,6 +69,23 @@ public class AnimationComponent implements Component {
 
     public AnimationComponent() {
 
+    }
+
+    public void setup(IntMap<Texture> textures) {
+        TextureRegion[] walkFrames = new TextureRegion[textures.size];
+        for (IntMap.Entry<Texture> texture : textures) {
+            walkFrames[texture.key] = new TextureRegion(texture.value);
+            framerate = 0.095f;
+
+            // Initialize the Animation with the frame interval and array of frames
+            Animation<TextureRegion> animation = new Animation<>(framerate, walkFrames);
+            entries.put(texture.key, animation);
+            animation.setPlayMode(Animation.PlayMode.LOOP_PINGPONG);
+        }
+
+        currentAnimationId = 0;
+        setPlaying(true);
+        setCurrentFrame(getCurrentAnimation().getKeyFrame(getStateTime()));
     }
 
     public void setup(IntMap<Texture> textures, int startFrame, int cols, int rows) {

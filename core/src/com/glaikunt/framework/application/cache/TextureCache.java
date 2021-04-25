@@ -15,6 +15,21 @@ public class TextureCache implements Cache {
     public static final String SPOT = "sprites/spot.png";
     public static final String NEXT_STAGE = "sprites/next_stage.png";
 
+    //  ################### OVERLAY FOLDER ###################
+
+    public static final String OVERLAY_1 = "sprites/video/scene1.png";
+    public static final String OVERLAY_2 = "sprites/video/scene2.png";
+    public static final String OVERLAY_3 = "sprites/video/scene3.png";
+    public static final String OVERLAY_4 = "sprites/video/scene4.png";
+    public static final String OVERLAY_5 = "sprites/video/scene5.png";
+    public static final String OVERLAY_6 = "sprites/video/scene6.png";
+    public static final String OVERLAY_7 = "sprites/video/scene7.png";
+    public static final String OVERLAY_8 = "sprites/video/scene8.png";
+    public static final String OVERLAY_9 = "sprites/video/scene9.png";
+    public static final String OVERLAY_10 = "sprites/video/scene10.png";
+
+    //  ################### OVERLAY FOLDER ###################
+
     private Map<String, Texture> textureMap = new HashMap<>();
     private boolean loaded = false;
 
@@ -24,6 +39,7 @@ public class TextureCache implements Cache {
         add(assetManager, PLAYER_IDLE, PLAYER_SITTING, PLAYER_MOVEMENT);
         add(assetManager, SPOT);
         add(assetManager, NEXT_STAGE);
+        add(assetManager, OVERLAY_1, OVERLAY_2, OVERLAY_3, OVERLAY_4, OVERLAY_5, OVERLAY_6, OVERLAY_7, OVERLAY_8, OVERLAY_9, OVERLAY_10);
     }
 
     @Override
