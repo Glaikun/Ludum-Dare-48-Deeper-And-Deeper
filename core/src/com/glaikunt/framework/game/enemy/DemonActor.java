@@ -29,7 +29,6 @@ import com.glaikunt.framework.esc.component.common.SizeComponent;
 import com.glaikunt.framework.esc.component.demon.DemonComponent;
 import com.glaikunt.framework.esc.component.game.LevelComponent;
 import com.glaikunt.framework.esc.component.player.AttackComponent;
-import com.glaikunt.framework.esc.component.player.ValidateAttackComponent;
 
 import java.util.Iterator;
 
@@ -64,8 +63,10 @@ public class DemonActor extends Actor {
         this.size = new SizeComponent(demonAnim.getCurrentFrame().getRegionWidth() * 4, demonAnim.getCurrentFrame().getRegionHeight() * 4);
         this.pos = new PositionComponent((Display.WORLD_WIDTH ) - (getWidth()) -15, (Display.WORLD_HEIGHT / 2) - (getHeight()));
 
+        this.level = applicationResources.getGlobalEntity().getComponent(LevelComponent.class);
+
         this.health = new HealthComponent();
-        this.health.setHealth(5);
+        this.health.setHealth(5 + (.5f * (level.getStage()-1)));
 
         this.demon = new DemonComponent();
 
@@ -81,11 +82,10 @@ public class DemonActor extends Actor {
         this.hitFont = applicationResources.getCacheRetriever().getFontCache(FontCache.BATTLE_FONT);
         this.hitFont.getRegion().flip(true, false);
 
-        this.level = applicationResources.getGlobalEntity().getComponent(LevelComponent.class);
 
         this.attack = new AttackComponent();
         this.attack.setAttackSpeed(new TickTimer(1));
-        this.attack.setDmg(.25f + (.1f * level.getStage()));
+        this.attack.setDmg(.05f + (.05f * level.getStage()));
 
         this.collision = new CollisionComponent();
         Rectangle bound = new Rectangle();

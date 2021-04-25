@@ -15,6 +15,8 @@ public class ValidateAttackComponent implements Component {
 
     private Vector2 currentPos = new Vector2(), targetPos = new Vector2();
 
+    private Rectangle supportArea;
+
     public boolean isInRange() {
         return inRange;
     }
@@ -45,5 +47,13 @@ public class ValidateAttackComponent implements Component {
 
     public void setTargetPos(Vector2 targetPos) {
         this.targetPos = targetPos;
+    }
+
+    public Rectangle getSupportArea() {
+        return supportArea;
+    }
+
+    public void setSupportArea(Rectangle supportArea) {
+        this.supportArea = supportArea;
     }
 }

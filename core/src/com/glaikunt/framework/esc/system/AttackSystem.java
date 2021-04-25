@@ -8,21 +8,24 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.MathUtils;
 import com.glaikunt.framework.application.ApplicationResources;
 import com.glaikunt.framework.esc.component.common.HealthComponent;
+import com.glaikunt.framework.esc.component.common.PositionComponent;
 import com.glaikunt.framework.esc.component.demon.DemonComponent;
 import com.glaikunt.framework.esc.component.game.LevelComponent;
 import com.glaikunt.framework.esc.component.player.AttackComponent;
 import com.glaikunt.framework.esc.component.player.ValidateAttackComponent;
 import com.glaikunt.framework.esc.component.player.WeaponComponent;
+import com.glaikunt.framework.game.weapon.WeaponType;
 
 public class AttackSystem extends EntitySystem {
 
-    private ImmutableArray<Entity> playerEntities;
+    private ImmutableArray<Entity> playerEntities, allWeapons;
     private Entity enemyEntity;
 
     private LevelComponent level;
 
     private ComponentMapper<AttackComponent> attackCM = ComponentMapper.getFor(AttackComponent.class);
     private ComponentMapper<WeaponComponent> weaponCM = ComponentMapper.getFor(WeaponComponent.class);
+    private ComponentMapper<PositionComponent> posCM = ComponentMapper.getFor(PositionComponent.class);
     private ComponentMapper<ValidateAttackComponent> validateCM = ComponentMapper.getFor(ValidateAttackComponent.class);
 
     private ComponentMapper<DemonComponent> demonCM = ComponentMapper.getFor(DemonComponent.class);
@@ -37,6 +40,13 @@ public class AttackSystem extends EntitySystem {
                 ValidateAttackComponent.class,
                 AttackComponent.class
         ).get());
+
+        this.allWeapons = applicationResources.getEngine().getEntitiesFor(Family.all(
+                WeaponComponent.class,
+                ValidateAttackComponent.class,
+                PositionComponent.class
+        ).get());
+
         this.enemyEntity = applicationResources.getEngine().getEntitiesFor(Family.all(
                 DemonComponent.class,
                 AttackComponent.class,
@@ -80,6 +90,7 @@ public class AttackSystem extends EntitySystem {
             HealthComponent playerHealth = healthCM.get(playerEntity);
             ValidateAttackComponent playerVal = validateCM.get(playerEntity);
             AttackComponent playerAttack = attackCM.get(playerEntity);
+            PositionComponent playerPos = posCM.get(playerEntity);
 
             if (playerAttack.isDead()) {
                 continue;
@@ -87,13 +98,27 @@ public class AttackSystem extends EntitySystem {
 
             playerAttack.getAttackSpeed().tick(delta);
 
-            if (playerVal.isInRange() && demonHealth.getLerpWidth() > 0 && playerAttack.getAttackSpeed().isTimerEventReady()) {
-                demonHealth.setLerpWidth(demonHealth.getLerpWidth() - playerWeapon.getWeaponType().getDamage());
+            if (!playerWeapon.getWeaponType().equals(WeaponType.SUPPORT) && playerVal.isInRange() && demonHealth.getLerpWidth() > 0 && playerAttack.getAttackSpeed().isTimerEventReady()) {
+                float extraDmg = 0;
+                for (int vai = 0; vai < allWeapons.size(); ++vai) {
+
+                    Entity deltaEntity = allWeapons.get(vai);
+                    WeaponComponent deltaWeapon = weaponCM.get(deltaEntity);
+                    ValidateAttackComponent deltaValidateAttack = validateCM.get(deltaEntity);
+
+                    if (deltaWeapon.getWeaponType().equals(WeaponType.SUPPORT) && deltaValidateAttack.getSupportArea().contains(playerPos.x, playerPos.y)) {
+                        extraDmg = deltaWeapon.getWeaponType().getDamage();
+                        break;
+                    }
+                }
+
+                float dmg = playerWeapon.getWeaponType().getDamage() + extraDmg;
+                demonHealth.setLerpWidth(demonHealth.getLerpWidth() - dmg);
                 if (demonHealth.getLerpWidth() < 0) {
                     demonHealth.setLerpWidth(0);
                 }
                 playerAttack.setJustAttacked(true);
-                demon.getHitDmg().add((int) (playerWeapon.getWeaponType().getDamage() * 10));
+                demon.getHitDmg().add((int) (dmg * 10));
             }
 
             if (playerHealth.getLerpWidth() > 0 && demonAttack.getAttackSpeed().isTimerPassedTarget()) {

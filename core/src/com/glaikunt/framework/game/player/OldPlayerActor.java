@@ -42,6 +42,8 @@ public class OldPlayerActor extends Actor {
 
     private CollisionComponent collision;
 
+    private Rectangle bufferArea;
+
     public OldPlayerActor(ApplicationResources applicationResources, Vector2 pos, WeaponType weapon, DemonActor demonActor, HealthComponent health) {
         super(applicationResources);
 
@@ -63,7 +65,15 @@ public class OldPlayerActor extends Actor {
         bound.set(pos.x + ((size.x/2)/2), pos.y, size.x/2, size.y/2);
         collision.setBound(bound);
 
+        this.bufferArea = new Rectangle();
+        this.bufferArea.setSize(getWidth() * 2, getHeight() * 1.5f);
+        this.bufferArea.setPosition(getX() + (getWidth()/2) - (bufferArea.width/2), getY() + (getHeight()/2) - (bufferArea.height/2));
+
         this.validateAttack = new ValidateAttackComponent();
+
+        if (this.weapon.getWeaponType().equals(WeaponType.SUPPORT)) {
+            this.validateAttack.setSupportArea(bufferArea);
+        }
 
         if (this.weapon.getWeaponType().equals(WeaponType.MELEE)) {
             Rectangle hostPos = new Rectangle();

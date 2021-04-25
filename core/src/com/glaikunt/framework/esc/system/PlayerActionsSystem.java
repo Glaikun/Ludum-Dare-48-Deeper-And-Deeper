@@ -21,7 +21,7 @@ import com.glaikunt.framework.game.weapon.WeaponType;
 
 public class PlayerActionsSystem extends EntitySystem {
 
-    private ImmutableArray<Entity> playerEntity;
+    private ImmutableArray<Entity> playerEntity, allPlayersEntity;
     private Entity demonEntity;
 
     private LevelComponent level;
@@ -44,6 +44,10 @@ public class PlayerActionsSystem extends EntitySystem {
                 SizeComponent.class,
                 WeaponComponent.class,
                 ValidateAttackComponent.class).get());
+
+        this.allPlayersEntity = applicationResources.getEngine().getEntitiesFor(Family.all(
+                ValidateAttackComponent.class,
+                PositionComponent.class).exclude(PlayerComponent.class).get());
 
         this.demonEntity = applicationResources.getEngine().getEntitiesFor(Family.all(
                 DemonComponent.class,
@@ -91,13 +95,31 @@ public class PlayerActionsSystem extends EntitySystem {
                 }
             }
 
-            //TODO need to check if nothing is in way of collision
-            //TODO if something appears then need to hit that object
-            //TODO can only fire when in range
-
             if (playerWeapon.getWeaponType().equals(WeaponType.RANGED)) {
 
                 if (Intersector.intersectSegmentRectangle(playerValidationAttack.getCurrentPos(), playerValidationAttack.getTargetPos(), demonRect)) {
+                    playerValidationAttack.setInRange(true);
+                } else if (playerValidationAttack.isInRange()) {
+                    playerValidationAttack.setInRange(false);
+                }
+            }
+
+            if (playerWeapon.getWeaponType().equals(WeaponType.SUPPORT)) {
+
+                boolean supportingPlayer = false;
+                for (int vai = 0; vai < allPlayersEntity.size(); ++vai) {
+
+                    Entity deltaEntity = allPlayersEntity.get(vai);
+                    ValidateAttackComponent deltaValidateAttack = validateAttackCM.get(deltaEntity);
+                    PositionComponent deltaPos = posCM.get(deltaEntity);
+
+                    if (playerValidationAttack.getSupportArea().contains(deltaPos.x, deltaPos.y)) {
+                        supportingPlayer = true;
+                        break;
+                    }
+                }
+
+                if (supportingPlayer) {
                     playerValidationAttack.setInRange(true);
                 } else if (playerValidationAttack.isInRange()) {
                     playerValidationAttack.setInRange(false);

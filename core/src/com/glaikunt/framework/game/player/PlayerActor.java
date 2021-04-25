@@ -54,12 +54,12 @@ public class PlayerActor extends Actor {
     private float healthDeltaWidth;
     private float healthMaxWidth;
 
-    private BitmapFont notInRangeFont;
-    private GlyphLayout notInRangeLayout, pressSpaceToStartLayout;
-
-    private Polygon line;
+    private BitmapFont helperFont;
+    private GlyphLayout notInRangeLayout, targetEnemyLayout, supperPlayerLayout, pressSpaceToStartLayout;
 
     private DemonActor demon;
+
+    private Rectangle bufferArea;
 
     public PlayerActor(ApplicationResources applicationResources, DemonActor demon) {
         super(applicationResources);
@@ -91,8 +91,11 @@ public class PlayerActor extends Actor {
 
         this.healthTexture = applicationResources.getCacheRetriever().geTextureCache(TextureCache.SPOT);
 
-        this.size = new SizeComponent(playerIdle.getCurrentFrame().getRegionWidth()  * 2, playerIdle.getCurrentFrame().getRegionHeight() * 2);
-        this.pos = new PositionComponent((Display.WORLD_WIDTH/2) - (getWidth()*2.5f), (Display.WORLD_HEIGHT/2) + (getHeight()/2) + 2.5f);
+        this.size = new SizeComponent(playerIdle.getCurrentFrame().getRegionWidth() * 2, playerIdle.getCurrentFrame().getRegionHeight() * 2);
+        this.pos = new PositionComponent((Display.WORLD_WIDTH / 2) - (getWidth() * 2.5f), (Display.WORLD_HEIGHT / 2) + (getHeight() / 2) + 2.5f);
+
+        this.bufferArea = new Rectangle();
+        this.bufferArea.setSize(getWidth() * 2, getHeight() * 1.5f);
 
         this.weapon = new WeaponComponent();
         this.weapon.setWeaponType(getApplicationResources().getGlobalEntity().getComponent(LevelComponent.class).getWeaponType());
@@ -106,10 +109,13 @@ public class PlayerActor extends Actor {
         this.player = new PlayerComponent();
 
         this.validateAttack = new ValidateAttackComponent();
+        this.validateAttack.setSupportArea(bufferArea);
 
-        this.notInRangeFont = applicationResources.getCacheRetriever().getFontCache(FontCache.BIG_FONT);
-        this.notInRangeLayout = new GlyphLayout(notInRangeFont, "Not In Range", Color.WHITE, 1, Align.left, false);
-        this.pressSpaceToStartLayout = new GlyphLayout(notInRangeFont, "Press Space To Start", Color.WHITE, 1, Align.left, false);
+        this.helperFont = applicationResources.getCacheRetriever().getFontCache(FontCache.BIG_FONT);
+        this.notInRangeLayout = new GlyphLayout(helperFont, "Not In Melee Range", Color.WHITE, 1, Align.left, false);
+        this.targetEnemyLayout = new GlyphLayout(helperFont, "Not Targeting Enemy", Color.WHITE, 1, Align.left, false);
+        this.supperPlayerLayout = new GlyphLayout(helperFont, "Stand Near Player", Color.WHITE, 1, Align.left, false);
+        this.pressSpaceToStartLayout = new GlyphLayout(helperFont, "Press Space To Start", Color.WHITE, 1, Align.left, false);
 
         this.level = applicationResources.getGlobalEntity().getComponent(LevelComponent.class);
 
@@ -117,9 +123,11 @@ public class PlayerActor extends Actor {
         this.yourAWizardHarry = new TextureRegion(applicationResources.getTexture(TextureCache.MAGIC_ICON));
         this.support = new TextureRegion(applicationResources.getTexture(TextureCache.SUPPORT_ICON));
         if (weapon.getWeaponType().equals(WeaponType.MELEE)) {
-            itemSize = new SizeComponent(sword.getRegionWidth()*1.5f, sword.getRegionHeight()*2);
-        } else  if (weapon.getWeaponType().equals(WeaponType.RANGED)) {
-            itemSize = new SizeComponent(sword.getRegionWidth()*2f, sword.getRegionHeight()*2);
+            itemSize = new SizeComponent(sword.getRegionWidth() * 1.5f, sword.getRegionHeight() * 2);
+        } else if (weapon.getWeaponType().equals(WeaponType.SUPPORT)) {
+            itemSize = new SizeComponent(support.getRegionWidth() * 1.5f, support.getRegionHeight() * 2);
+        } else if (weapon.getWeaponType().equals(WeaponType.RANGED)) {
+            itemSize = new SizeComponent(sword.getRegionWidth() * 2f, sword.getRegionHeight() * 2);
         }
 
         Entity entity = new Entity();
@@ -163,7 +171,20 @@ public class PlayerActor extends Actor {
             }
         } else if (weapon.getWeaponType().equals(WeaponType.RANGED)) {
 
-            batch.draw(yourAWizardHarry, getX() + (getWidth()/2) - (itemSize.x/2), getY() + getHeight(), itemSize.x, itemSize.y);
+            batch.draw(yourAWizardHarry, getX() + (getWidth() / 2) - (itemSize.x / 2), getY() + getHeight(), itemSize.x, itemSize.y);
+        } else  if (!player.isSitting() && weapon.getWeaponType().equals(WeaponType.SUPPORT)) {
+
+            if (player.isMovingLeft()) {
+                if (support.isFlipX()) {
+                    support.flip(true, false);
+                }
+                batch.draw(support, getX() + itemSize.x - 10, getY() + (itemSize.y / 1.5f), itemSize.x, itemSize.y);
+            } else {
+                if (!support.isFlipX()) {
+                    support.flip(true, false);
+                }
+                batch.draw(support, getX() - 10, getY() + (itemSize.y / 1.5f), itemSize.x, itemSize.y);
+            }
         }
 
         if (player.isSitting()) {
@@ -188,12 +209,26 @@ public class PlayerActor extends Actor {
         batch.draw(healthTexture, getX(), getY() + getHeight() + healthTexture.getHeight(), healthDeltaWidth, 5);
         batch.setColor(1, 1, 1, 1f);
 
-        if (!level.isLevelStarted() ) {
+        if (!level.isLevelStarted()) {
 
-            if (!validateAttack.isInRange()) {
-                notInRangeFont.draw(batch, notInRangeLayout, (Display.WORLD_WIDTH / 2) - (notInRangeLayout.width / 2), (Display.WORLD_HEIGHT) - (notInRangeLayout.height) - 10);
-            } else {
-                notInRangeFont.draw(batch, pressSpaceToStartLayout, (Display.WORLD_WIDTH / 2) - (pressSpaceToStartLayout.width / 2), (Display.WORLD_HEIGHT) - (pressSpaceToStartLayout.height) - 10);
+            if (weapon.getWeaponType().equals(WeaponType.MELEE)) {
+                if (!validateAttack.isInRange()) {
+                    helperFont.draw(batch, notInRangeLayout, (Display.WORLD_WIDTH / 2) - (notInRangeLayout.width / 2), (Display.WORLD_HEIGHT) - (notInRangeLayout.height) - 10);
+                } else {
+                    helperFont.draw(batch, pressSpaceToStartLayout, (Display.WORLD_WIDTH / 2) - (pressSpaceToStartLayout.width / 2), (Display.WORLD_HEIGHT) - (pressSpaceToStartLayout.height) - 10);
+                }
+            } else if (weapon.getWeaponType().equals(WeaponType.RANGED)) {
+                if (!validateAttack.isInRange()) {
+                    helperFont.draw(batch, targetEnemyLayout, (Display.WORLD_WIDTH / 2) - (targetEnemyLayout.width / 2), (Display.WORLD_HEIGHT) - (targetEnemyLayout.height) - 10);
+                } else {
+                    helperFont.draw(batch, pressSpaceToStartLayout, (Display.WORLD_WIDTH / 2) - (pressSpaceToStartLayout.width / 2), (Display.WORLD_HEIGHT) - (pressSpaceToStartLayout.height) - 10);
+                }
+            } else if (weapon.getWeaponType().equals(WeaponType.SUPPORT)) {
+                if (!validateAttack.isInRange()) {
+                    helperFont.draw(batch, supperPlayerLayout, (Display.WORLD_WIDTH / 2) - (supperPlayerLayout.width / 2), (Display.WORLD_HEIGHT) - (supperPlayerLayout.height) - 10);
+                } else {
+                    helperFont.draw(batch, pressSpaceToStartLayout, (Display.WORLD_WIDTH / 2) - (pressSpaceToStartLayout.width / 2), (Display.WORLD_HEIGHT) - (pressSpaceToStartLayout.height) - 10);
+                }
             }
         }
 
@@ -201,7 +236,7 @@ public class PlayerActor extends Actor {
 
             if (getStage() != null) {
 
-                getStage().addActor(new FrostActor(getApplicationResources(), getX() + (getWidth()/2), getY() + (getHeight()/2), new PositionComponent(validateAttack.getTargetPos().x, validateAttack.getTargetPos().y)));
+                getStage().addActor(new FrostActor(getApplicationResources(), getX() + (getWidth() / 2), getY() + (getHeight() / 2), new PositionComponent(validateAttack.getTargetPos().x, validateAttack.getTargetPos().y)));
             }
             attack.setJustAttacked(false);
         }
@@ -209,6 +244,8 @@ public class PlayerActor extends Actor {
 
     @Override
     public void act(float delta) {
+
+        bufferArea.setPosition(getX() + (getWidth()/2) - (bufferArea.width/2), getY() + (getHeight()/2) - (bufferArea.height/2));
 
         if (healthDeltaWidth != (health.getDeltaHealth() / health.getHealth()) * healthMaxWidth) {
             healthDeltaWidth = (health.getDeltaHealth() / health.getHealth()) * healthMaxWidth;
@@ -229,6 +266,10 @@ public class PlayerActor extends Actor {
     @Override
     public void drawDebug(ShapeRenderer shapes) {
 
+        if (weapon.getWeaponType().equals(WeaponType.SUPPORT)) {
+            shapes.rect(bufferArea.getX(), bufferArea.getY(), bufferArea.getWidth(), bufferArea.getHeight());
+        }
+
         if (weapon.getWeaponType().equals(WeaponType.RANGED) && !level.isLevelStarted()) {
             shapes.line(getX() + (getWidth() / 2), getY() + (getHeight() / 2), getApplicationResources().getFrontStageMousePosition().x, getApplicationResources().getFrontStageMousePosition().y);
 
@@ -242,7 +283,7 @@ public class PlayerActor extends Actor {
         for (Rectangle rectangle : validateAttack.getAvailableSpace()) {
             shapes.rect(rectangle.x, rectangle.y, rectangle.width, rectangle.height);
         }
-        shapes.rect(getX() + ((getWidth()/2)/2), getY(), getWidth()/2, getHeight()/2);
+        shapes.rect(getX() + ((getWidth() / 2) / 2), getY(), getWidth() / 2, getHeight() / 2);
     }
 
     public WeaponComponent getWeapon() {
