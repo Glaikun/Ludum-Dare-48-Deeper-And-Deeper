@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -22,20 +23,22 @@ import com.glaikunt.framework.application.TickTimer;
 import com.glaikunt.framework.application.cache.FontCache;
 import com.glaikunt.framework.application.cache.TextureCache;
 import com.glaikunt.framework.esc.component.animation.AnimationComponent;
+import com.glaikunt.framework.esc.component.animation.AnimationsComponent;
 import com.glaikunt.framework.esc.component.common.CollisionComponent;
 import com.glaikunt.framework.esc.component.common.HealthComponent;
 import com.glaikunt.framework.esc.component.common.PositionComponent;
 import com.glaikunt.framework.esc.component.common.SizeComponent;
 import com.glaikunt.framework.esc.component.demon.DemonComponent;
 import com.glaikunt.framework.esc.component.game.LevelComponent;
+import com.glaikunt.framework.esc.component.misc.BloatingComponent;
 import com.glaikunt.framework.esc.component.player.AttackComponent;
 
 import java.util.Iterator;
 
 public class DemonActor extends Actor {
 
-    private AnimationComponent demonAnim;
-    private Texture healthBarTexture;
+    private AnimationComponent demonAnim, demonDeathAnim;
+    private Texture healthBarTexture, headsetTexture;
     private DemonComponent demon;
     private HealthComponent health;
     private AttackComponent attack;
@@ -54,11 +57,20 @@ public class DemonActor extends Actor {
 
     private CollisionComponent collision;
 
+    private BloatingComponent bloating;
+
     public DemonActor(ApplicationResources applicationResources) {
         super(applicationResources);
 
         this.demonAnim = new AnimationComponent(applicationResources.getCacheRetriever().geTextureCache(TextureCache.DEMON), 5, 1);
         this.healthBarTexture = applicationResources.getCacheRetriever().geTextureCache(TextureCache.SPOT);
+
+        this.demonDeathAnim = new AnimationComponent(applicationResources.getCacheRetriever().geTextureCache(TextureCache.DEMON_DEATH), 27, 1);
+        this.demonDeathAnim.setPlayMode(Animation.PlayMode.NORMAL);
+        this.demonDeathAnim.setFramerate(.08f);
+        this.demonDeathAnim.setPlaying(false);
+
+        this.headsetTexture = applicationResources.getTexture(TextureCache.HEADSET);
 
         this.size = new SizeComponent(demonAnim.getCurrentFrame().getRegionWidth() * 4, demonAnim.getCurrentFrame().getRegionHeight() * 4);
         this.pos = new PositionComponent((Display.WORLD_WIDTH ) - (getWidth()) -15, (Display.WORLD_HEIGHT / 2) - (getHeight()));
@@ -82,6 +94,9 @@ public class DemonActor extends Actor {
         this.hitFont = applicationResources.getCacheRetriever().getFontCache(FontCache.BATTLE_FONT);
         this.hitFont.getRegion().flip(true, false);
 
+        this.bloating = new BloatingComponent();
+        this.bloating.setMaxBloating(5);
+        this.bloating.setSpeed(10f);
 
         this.attack = new AttackComponent();
         this.attack.setAttackSpeed(new TickTimer(1));
@@ -92,9 +107,14 @@ public class DemonActor extends Actor {
         bound.set(pos.x, pos.y, size.x, size.y);
         collision.setBound(bound);
 
+        AnimationsComponent animationsComponent = new AnimationsComponent();
+        animationsComponent.add(demonAnim);
+        animationsComponent.add(demonDeathAnim);
+
         Entity entity = new Entity();
 
-        entity.add(demonAnim);
+        entity.add(animationsComponent);
+        entity.add(bloating);
         entity.add(pos);
         entity.add(size);
         entity.add(health);
@@ -108,7 +128,15 @@ public class DemonActor extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
 
-        batch.draw(demonAnim.getCurrentFrame(), getX(), getY(), getWidth(), getHeight());
+        if (demonDeathAnim.isPlaying() && !demonDeathAnim.isAnimationFinished()) {
+            batch.draw(demonDeathAnim.getCurrentFrame(), getX(), getY(), getWidth(), getHeight());
+        } else if (!demonDeathAnim.isPlaying()){
+            batch.draw(demonAnim.getCurrentFrame(), getX(), getY(), getWidth(), getHeight());
+        }
+
+        if (demonDeathAnim.isPlaying()) {
+            batch.draw(headsetTexture, getX() + (getWidth()/2) - (headsetTexture.getWidth()/2f) , getY() + (getHeight()/2) - (headsetTexture.getHeight()/2f) + bloating.getBloating(), headsetTexture.getWidth(), headsetTexture.getHeight());
+        }
 
         if (level.isLevelStarted() && !level.isGameOver()) {
 
@@ -130,6 +158,10 @@ public class DemonActor extends Actor {
 
     @Override
     public void act(float delta) {
+
+        if (health.getLerpWidth() <= 0 && !demonDeathAnim.isPlaying()) {
+            demonDeathAnim.setPlaying(true);
+        }
 
         collision.getBound().set(pos.x, pos.y, size.x, size.y);
 

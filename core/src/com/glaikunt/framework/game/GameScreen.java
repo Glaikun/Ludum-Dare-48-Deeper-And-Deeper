@@ -26,6 +26,7 @@ import com.glaikunt.framework.esc.component.game.LevelComponent;
 import com.glaikunt.framework.esc.component.player.GhostPlayerComponent;
 import com.glaikunt.framework.esc.system.AnimationSystem;
 import com.glaikunt.framework.esc.system.AttackSystem;
+import com.glaikunt.framework.esc.system.BloatingSystem;
 import com.glaikunt.framework.esc.system.PlayerActionsSystem;
 import com.glaikunt.framework.esc.system.PlayerMovementSystem;
 import com.glaikunt.framework.game.collision.CollisionActor;
@@ -97,6 +98,7 @@ public class GameScreen extends Screen {
         getEngine().addSystem(new PlayerMovementSystem(getApplicationResources()));
         getEngine().addSystem(new AttackSystem(getApplicationResources()));
         getEngine().addSystem(new AnimationSystem(getEngine()));
+        getEngine().addSystem(new BloatingSystem(getEngine()));
 
         getApplicationResources().getAudioManager().loopGameMusic();
     }
