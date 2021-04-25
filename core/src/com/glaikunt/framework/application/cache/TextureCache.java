@@ -15,6 +15,10 @@ public class TextureCache implements Cache {
     public static final String SPOT = "sprites/spot.png";
     public static final String NEXT_STAGE = "sprites/next_stage.png";
 
+    public static final String ATTACK_ICON = "sprites/sword.png";
+    public static final String MAGIC_ICON = "sprites/magic.png";
+    public static final String SUPPORT_ICON = "sprites/support.png";
+
     //  ################### OVERLAY FOLDER ###################
 
     public static final String OVERLAY_1 = "sprites/video/scene1.png";
@@ -39,6 +43,7 @@ public class TextureCache implements Cache {
         add(assetManager, PLAYER_IDLE, PLAYER_SITTING, PLAYER_MOVEMENT);
         add(assetManager, SPOT);
         add(assetManager, NEXT_STAGE);
+        add(assetManager, ATTACK_ICON, MAGIC_ICON, SUPPORT_ICON);
         add(assetManager, OVERLAY_1, OVERLAY_2, OVERLAY_3, OVERLAY_4, OVERLAY_5, OVERLAY_6, OVERLAY_7, OVERLAY_8, OVERLAY_9, OVERLAY_10);
     }
 

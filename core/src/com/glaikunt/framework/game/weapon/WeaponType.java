@@ -6,7 +6,7 @@ public enum WeaponType {
 
     MELEE(.5f, new TickTimer(1f)),
     RANGED(.5f, new TickTimer(1f)),
-    UPGRADE(.5f, new TickTimer(1f));
+    SUPPORT(.5f, new TickTimer(1f));
 
     private float damage;
     private TickTimer attackSpeed;

@@ -1,22 +1,14 @@
 package com.glaikunt.framework.splash;
 
-import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.glaikunt.framework.application.ApplicationResources;
 import com.glaikunt.framework.application.Screen;
-import com.glaikunt.framework.application.TickTimer;
-import com.glaikunt.framework.application.cache.TextureCache;
-import com.glaikunt.framework.esc.component.animation.AnimationComponent;
 import com.glaikunt.framework.esc.system.AnimationSystem;
-import com.glaikunt.framework.game.GameScreen;
+import com.glaikunt.framework.esc.system.BloatingSystem;
 import com.glaikunt.framework.ui.OverlayActor;
 
 public class SplashScreen extends Screen {
-
-    private AnimationComponent animation;
-    private TickTimer nextLevel = new TickTimer(3);
 
     public SplashScreen(ApplicationResources applicationResources) {
         super(applicationResources);
@@ -25,17 +17,11 @@ public class SplashScreen extends Screen {
     @Override
     public void show() {
 
-        this.animation = new AnimationComponent(getApplicationResources().getCacheRetriever().geTextureCache(TextureCache.NEXT_STAGE), 25, 1);
-        this.animation.setPlayMode(Animation.PlayMode.NORMAL);
-        this.animation.setFramerate(.2f);
-
-        Entity entity = new Entity();
-        entity.add(animation);
-        getEngine().addEntity(entity);
-
+        getFront().addActor(new ChooseWeaponActor(getApplicationResources()));
         getUX().addActor(new OverlayActor(getApplicationResources()));
 
         getEngine().addSystem(new AnimationSystem(getEngine()));
+        getEngine().addSystem(new BloatingSystem(getEngine()));
     }
 
     @Override
@@ -46,17 +32,11 @@ public class SplashScreen extends Screen {
     @Override
     public void update(float delta) {
 
+        getApplicationResources().getFrontStageMousePosition().set(getFront().getCamera().unproject(getApplicationResources().getFrontStageMousePosition().set(Gdx.input.getX(), Gdx.input.getY(), 0)));
+
         getBackground().act();
         getFront().act();
         getUX().act();
-
-        if (animation.isAnimationFinished()) {
-
-            nextLevel.tick(delta);
-            if (nextLevel.isTimerEventReady()) {
-                getDisplay().setScreen(new GameScreen(getApplicationResources()));
-            }
-        }
     }
 
     @Override
@@ -67,11 +47,6 @@ public class SplashScreen extends Screen {
 
         getBackground().draw();
         getFront().draw();
-        getFront().getBatch().begin();
-
-        getFront().getBatch().draw(animation.getCurrentFrame(), 0, 0);
-
-        getFront().getBatch().end();
         getUX().draw();
 
     }
