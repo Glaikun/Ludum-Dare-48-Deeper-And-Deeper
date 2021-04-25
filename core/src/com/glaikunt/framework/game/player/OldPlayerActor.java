@@ -21,7 +21,9 @@ import com.glaikunt.framework.esc.component.common.PositionComponent;
 import com.glaikunt.framework.esc.component.common.SizeComponent;
 import com.glaikunt.framework.esc.component.player.AttackComponent;
 import com.glaikunt.framework.esc.component.player.GhostPlayerComponent;
+import com.glaikunt.framework.esc.component.player.ValidateAttackComponent;
 import com.glaikunt.framework.esc.component.player.WeaponComponent;
+import com.glaikunt.framework.game.enemy.DemonActor;
 import com.glaikunt.framework.game.weapon.WeaponType;
 
 public class OldPlayerActor extends Actor {
@@ -37,7 +39,7 @@ public class OldPlayerActor extends Actor {
 
     private CollisionComponent collision;
 
-    public OldPlayerActor(ApplicationResources applicationResources, Vector2 pos, WeaponType weapon) {
+    public OldPlayerActor(ApplicationResources applicationResources, Vector2 pos, WeaponType weapon, DemonActor demonActor) {
         super(applicationResources);
 
         this.playerTexture = new AnimationComponent(applicationResources.getCacheRetriever().geTextureCache(TextureCache.PLAYER_IDLE), 3, 1).getCurrentAnimation().getKeyFrames()[0];
@@ -60,13 +62,21 @@ public class OldPlayerActor extends Actor {
         bound.set(pos.x + ((size.x/2)/2), pos.y, size.x/2, size.y/2);
         collision.setBound(bound);
 
+
+        ValidateAttackComponent validateAttackComponent = new ValidateAttackComponent();
+        Rectangle hostPos = new Rectangle();
+        int collisionSpace = 15;
+        hostPos.set(demonActor.getX() - collisionSpace, demonActor.getY(), collisionSpace, demonActor.getHeight());
+        validateAttackComponent.setInRange(hostPos.contains(getX() + (getWidth() / 2), getY()));
+
         Entity entity = new Entity();
 
         entity.add(this.pos);
         entity.add(this.size);
+        entity.add(validateAttackComponent);
         entity.add(this.health);
         AttackComponent attack = new AttackComponent();
-        attack.setAttackSpeed(new TickTimer(weapon.getAttackSpeed().getTargetTime()));
+        attack.setAttackSpeed(new TickTimer(weapon.getAttackSpeed()));
         attack.setDmg(weapon.getDamage());
         entity.add(attack);
         entity.add(new GhostPlayerComponent());

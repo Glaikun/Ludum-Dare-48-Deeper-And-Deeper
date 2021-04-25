@@ -4,14 +4,14 @@ import com.glaikunt.framework.application.TickTimer;
 
 public enum WeaponType {
 
-    MELEE(.5f, new TickTimer(1f)),
-    RANGED(.2f, new TickTimer(1f)),
-    SUPPORT(.5f, new TickTimer(1f));
+    MELEE(.5f, 1f),
+    RANGED(.2f, 1f),
+    SUPPORT(.5f, 1f);
 
     private float damage;
-    private TickTimer attackSpeed;
+    private float attackSpeed;
 
-    WeaponType(float damage, TickTimer attackSpeed) {
+    WeaponType(float damage, float attackSpeed) {
         this.damage = damage;
         this.attackSpeed = attackSpeed;
     }
@@ -20,7 +20,7 @@ public enum WeaponType {
         return damage;
     }
 
-    public TickTimer getAttackSpeed() {
+    public float getAttackSpeed() {
         return attackSpeed;
     }
 }

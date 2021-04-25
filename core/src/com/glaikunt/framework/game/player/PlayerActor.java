@@ -136,7 +136,7 @@ public class PlayerActor extends Actor {
         entity.add(new VelocityComponent(100, 100));
         entity.add(player);
         AttackComponent attack = new AttackComponent();
-        attack.setAttackSpeed(new TickTimer(weapon.getWeaponType().getAttackSpeed().getTargetTime()));
+        attack.setAttackSpeed(new TickTimer(weapon.getWeaponType().getAttackSpeed()));
         attack.setDmg(weapon.getWeaponType().getDamage());
         entity.add(attack);
         entity.add(weapon);
@@ -188,7 +188,7 @@ public class PlayerActor extends Actor {
 
         if (!level.isLevelStarted() ) {
 
-            if (!validateAttack.isAvailableSpaceToAttack()) {
+            if (!validateAttack.isInRange()) {
                 notInRangeFont.draw(batch, notInRangeLayout, (Display.WORLD_WIDTH / 2) - (notInRangeLayout.width / 2), (Display.WORLD_HEIGHT) - (notInRangeLayout.height) - 10);
             } else {
                 notInRangeFont.draw(batch, pressSpaceToStartLayout, (Display.WORLD_WIDTH / 2) - (pressSpaceToStartLayout.width / 2), (Display.WORLD_HEIGHT) - (pressSpaceToStartLayout.height) - 10);
@@ -213,8 +213,12 @@ public class PlayerActor extends Actor {
     @Override
     public void drawDebug(ShapeRenderer shapes) {
 
-        shapes.line(getX() + (getWidth()/2), getY() + (getHeight()/2), getApplicationResources().getFrontStageMousePosition().x, getApplicationResources().getFrontStageMousePosition().y);
+        if (weapon.getWeaponType().equals(WeaponType.RANGED) && !level.isLevelStarted()) {
+            shapes.line(getX() + (getWidth() / 2), getY() + (getHeight() / 2), getApplicationResources().getFrontStageMousePosition().x, getApplicationResources().getFrontStageMousePosition().y);
 
+            validateAttack.getCurrentPos().set(getX() + (getWidth() / 2), getY() + (getHeight() / 2));
+            validateAttack.getTargetPos().set(getApplicationResources().getFrontStageMousePosition().x, getApplicationResources().getFrontStageMousePosition().y);
+        }
         if (Gdx.app.getLogLevel() == Logger.NONE) {
             return;
         }
@@ -227,5 +231,9 @@ public class PlayerActor extends Actor {
 
     public WeaponComponent getWeapon() {
         return weapon;
+    }
+
+    public ValidateAttackComponent getValidateAttack() {
+        return validateAttack;
     }
 }

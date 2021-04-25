@@ -29,6 +29,7 @@ import com.glaikunt.framework.esc.component.common.SizeComponent;
 import com.glaikunt.framework.esc.component.demon.DemonComponent;
 import com.glaikunt.framework.esc.component.game.LevelComponent;
 import com.glaikunt.framework.esc.component.player.AttackComponent;
+import com.glaikunt.framework.esc.component.player.ValidateAttackComponent;
 
 import java.util.Iterator;
 
@@ -91,6 +92,7 @@ public class DemonActor extends Actor {
         bound.set(pos.x, pos.y, size.x, size.y);
         collision.setBound(bound);
 
+
         Entity entity = new Entity();
 
         entity.add(demonAnim);
@@ -112,7 +114,7 @@ public class DemonActor extends Actor {
         if (level.isLevelStarted()) {
 
             batch.setColor(Color.RED);
-            batch.draw(healthBarTexture, healthBarPos.x, healthBarPos.y, healthDeltaWidth, healthBarSize.y * 2);
+            batch.draw(healthBarTexture, healthBarPos.x, healthBarPos.y, healthDeltaWidth, (healthBarSize.y * 2));
 
             batch.setColor(Color.FOREST);
             batch.draw(healthBarTexture, healthBarPos.x, healthBarPos.y - borderSize.y, healthMaxWidth, borderSize.y);

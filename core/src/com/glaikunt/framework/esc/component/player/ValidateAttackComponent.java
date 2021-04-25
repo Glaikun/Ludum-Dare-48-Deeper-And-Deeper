@@ -10,11 +10,10 @@ import java.util.List;
 public class ValidateAttackComponent implements Component {
 
     private boolean inRange = false;
-    private boolean availableSpaceToAttack = false;
 
     private List<Rectangle> availableSpace = new LinkedList<>();
 
-    private Vector2 currentPos, targetPos;
+    private Vector2 currentPos = new Vector2(), targetPos = new Vector2();
 
     public boolean isInRange() {
         return inRange;
@@ -22,14 +21,6 @@ public class ValidateAttackComponent implements Component {
 
     public void setInRange(boolean inRange) {
         this.inRange = inRange;
-    }
-
-    public boolean isAvailableSpaceToAttack() {
-        return availableSpaceToAttack;
-    }
-
-    public void setAvailableSpaceToAttack(boolean availableSpaceToAttack) {
-        this.availableSpaceToAttack = availableSpaceToAttack;
     }
 
     public List<Rectangle> getAvailableSpace() {

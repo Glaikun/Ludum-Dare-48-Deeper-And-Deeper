@@ -3,8 +3,11 @@ package com.glaikunt.framework.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Container;
 import com.badlogic.gdx.utils.Sort;
@@ -18,6 +21,7 @@ import com.glaikunt.framework.esc.system.AnimationSystem;
 import com.glaikunt.framework.esc.system.AttackSystem;
 import com.glaikunt.framework.esc.system.PlayerActionsSystem;
 import com.glaikunt.framework.esc.system.PlayerMovementSystem;
+import com.glaikunt.framework.game.collision.CollisionActor;
 import com.glaikunt.framework.game.enemy.DemonActor;
 import com.glaikunt.framework.game.player.OldPlayerActor;
 import com.glaikunt.framework.game.player.PlayerActor;
@@ -48,10 +52,24 @@ public class GameScreen extends Screen {
         getFront().addActor(player);
 
         for (GhostPlayerComponent ghostPlayerComponent : level.getGhostPlayers()) {
-            getFront().addActor(new OldPlayerActor(getApplicationResources(), ghostPlayerComponent.getPos(), ghostPlayerComponent.getWeapon()));
+            getFront().addActor(new OldPlayerActor(getApplicationResources(), ghostPlayerComponent.getPos(), ghostPlayerComponent.getWeapon(), demon));
         }
 
         getUX().addActor(new OverlayActor(getApplicationResources()));
+
+        TiledMap map = getApplicationResources().getCacheRetriever().getTiledMapCache(TiledCache.MAP);
+        TiledMapTileLayer collisionLayer = (TiledMapTileLayer) map.getLayers().get("Collision");
+        for (int y = collisionLayer.getHeight(); y >= 0; y--) {
+            float yPos = (y * (int) collisionLayer.getTileHeight());
+            for (int x = 0; x < collisionLayer.getWidth(); x++) {
+                float xPos = (x * (int) collisionLayer.getTileWidth());
+                TiledMapTileLayer.Cell cell = collisionLayer.getCell(x, y);
+                if (cell == null) continue;
+
+                Vector2 pos = new Vector2(xPos, yPos);
+                getFront().addActor(new CollisionActor(getApplicationResources(), pos.x, pos.y, 16, 16));
+            }
+        }
 
         getEngine().addSystem(new PlayerActionsSystem(getApplicationResources()));
         getEngine().addSystem(new PlayerMovementSystem(getApplicationResources()));

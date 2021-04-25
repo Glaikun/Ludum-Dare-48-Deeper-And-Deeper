@@ -48,20 +48,20 @@ public class ChooseWeaponActor extends Actor {
         this.size = new SizeComponent(attackIcon.getWidth()*10, attackIcon.getHeight()*10);
 
         this.attackRect = new Rectangle();
-        this.attackRect.set((Display.WORLD_WIDTH/2) - (size.x/2f), (Display.WORLD_HEIGHT/2) - (size.y/2f), size.x, size.y);
+        this.attackRect.set((Display.WORLD_WIDTH/2) - (size.x/2f), (Display.WORLD_HEIGHT/2), size.x, size.y);
 
         this.magicRect = new Rectangle();
-        this.magicRect.set((Display.WORLD_WIDTH/2) - (size.x/2f) - (size.x * 1.4f), (Display.WORLD_HEIGHT/2) - (size.y/2f), size.x, size.y);
+        this.magicRect.set((Display.WORLD_WIDTH/2) - (size.x/2f) - (size.x * 1.4f), (Display.WORLD_HEIGHT/2), size.x, size.y);
 
         this.supportRect = new Rectangle();
-        this.supportRect.set((Display.WORLD_WIDTH/2) - (size.x/2f) + (size.x * 1.4f), (Display.WORLD_HEIGHT/2) - (size.y/2f), size.x, size.y);
+        this.supportRect.set((Display.WORLD_WIDTH/2) - (size.x/2f) + (size.x * 1.4f), (Display.WORLD_HEIGHT/2), size.x, size.y);
 
         this.chooseYourWeaponFont = applicationResources.getCacheRetriever().getFontCache(FontCache.BIG_FONT);
         this.layout = new GlyphLayout(chooseYourWeaponFont, "Choose Your Weapon", Color.WHITE, 1, Align.left, false);
 
         this.bloating = new BloatingComponent();
-        this.bloating.setMaxBloating(5f);
-        this.bloating.setSpeed(20f);
+        this.bloating.setMaxBloating(10f);
+        this.bloating.setSpeed(40f);
 
         Entity entity = new Entity();
         entity.add(animation);

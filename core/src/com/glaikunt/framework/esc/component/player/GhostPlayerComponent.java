@@ -8,6 +8,15 @@ public class GhostPlayerComponent implements Component {
 
     private PositionComponent pos;
     private WeaponType weapon;
+    private boolean inRange;
+
+    public void setInRange(boolean inRange) {
+        this.inRange = inRange;
+    }
+
+    public boolean isInRange() {
+        return inRange;
+    }
 
     public PositionComponent getPos() {
         return pos;

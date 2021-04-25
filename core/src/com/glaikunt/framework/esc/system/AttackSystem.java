@@ -11,6 +11,7 @@ import com.glaikunt.framework.esc.component.common.HealthComponent;
 import com.glaikunt.framework.esc.component.demon.DemonComponent;
 import com.glaikunt.framework.esc.component.game.LevelComponent;
 import com.glaikunt.framework.esc.component.player.AttackComponent;
+import com.glaikunt.framework.esc.component.player.ValidateAttackComponent;
 import com.glaikunt.framework.esc.component.player.WeaponComponent;
 
 public class AttackSystem extends EntitySystem {
@@ -21,6 +22,7 @@ public class AttackSystem extends EntitySystem {
 
     private ComponentMapper<AttackComponent> attackCM = ComponentMapper.getFor(AttackComponent.class);
     private ComponentMapper<WeaponComponent> weaponCM = ComponentMapper.getFor(WeaponComponent.class);
+    private ComponentMapper<ValidateAttackComponent> validateCM = ComponentMapper.getFor(ValidateAttackComponent.class);
 
     private ComponentMapper<DemonComponent> demonCM = ComponentMapper.getFor(DemonComponent.class);
 
@@ -30,7 +32,9 @@ public class AttackSystem extends EntitySystem {
 
         this.playerEntities = applicationResources.getEngine().getEntitiesFor(Family.all(
                 WeaponComponent.class,
-                HealthComponent.class
+                HealthComponent.class,
+                ValidateAttackComponent.class,
+                AttackComponent.class
         ).get());
         this.enemyEntities = applicationResources.getEngine().getEntitiesFor(Family.all(
                 DemonComponent.class,
@@ -52,8 +56,10 @@ public class AttackSystem extends EntitySystem {
             Entity playerEntity = playerEntities.get(pe);
             WeaponComponent playerWeapon = weaponCM.get(playerEntity);
             HealthComponent playerHealth = healthCM.get(playerEntity);
+            ValidateAttackComponent playerVal = validateCM.get(playerEntity);
+            AttackComponent playerAttack = attackCM.get(playerEntity);
 
-            playerWeapon.getWeaponType().getAttackSpeed().tick(delta);
+            playerAttack.getAttackSpeed().tick(delta);
 
             for (int ee = 0; ee < enemyEntities.size(); ++ee) {
 
@@ -64,12 +70,12 @@ public class AttackSystem extends EntitySystem {
 
                 demonAttack.getAttackSpeed().tick(delta);
 
-                if (demonHealth.getLerpWidth() > 0 && playerWeapon.getWeaponType().getAttackSpeed().isTimerEventReady()) {
+                if (playerVal.isInRange() && demonHealth.getLerpWidth() > 0 && playerAttack.getAttackSpeed().isTimerEventReady()) {
                     demonHealth.setLerpWidth(demonHealth.getLerpWidth() - playerWeapon.getWeaponType().getDamage());
                     demon.getHitDmg().add((int) (playerWeapon.getWeaponType().getDamage() * 10));
                 }
 
-                if (!MathUtils.isEqual(demonHealth.getLerpWidth(), demonHealth.getDeltaHealth(), .5f)) {
+                if (playerVal.isInRange() && !MathUtils.isEqual(demonHealth.getLerpWidth(), demonHealth.getDeltaHealth(), .5f)) {
                     demonHealth.setDeltaHealth(MathUtils.lerp(demonHealth.getDeltaHealth(), demonHealth.getLerpWidth(), 5 * delta));
                 }else if (demonHealth.getLerpWidth() != demonHealth.getDeltaHealth()) {
                     demonHealth.setDeltaHealth(demonHealth.getLerpWidth());

@@ -4,8 +4,10 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.math.Intersector;
 import com.glaikunt.framework.application.ApplicationResources;
 import com.glaikunt.framework.application.Rectangle;
 import com.glaikunt.framework.esc.component.common.PositionComponent;
@@ -19,7 +21,7 @@ import com.glaikunt.framework.game.weapon.WeaponType;
 
 public class PlayerActionsSystem extends EntitySystem {
 
-    private Entity playerEntity;
+    private ImmutableArray<Entity> playerEntity;
     private Entity demonEntity;
 
     private LevelComponent level;
@@ -41,8 +43,7 @@ public class PlayerActionsSystem extends EntitySystem {
                 PositionComponent.class,
                 SizeComponent.class,
                 WeaponComponent.class,
-                ValidateAttackComponent.class).get())
-                .get(0);
+                ValidateAttackComponent.class).get());
 
         this.demonEntity = applicationResources.getEngine().getEntitiesFor(Family.all(
                 DemonComponent.class,
@@ -52,50 +53,58 @@ public class PlayerActionsSystem extends EntitySystem {
 
         this.level = applicationResources.getGlobalEntity().getComponent(LevelComponent.class);
 
-        PlayerComponent player = playerCM.get(playerEntity);
-        PositionComponent playerPos = posCM.get(playerEntity);
-        WeaponComponent playerWeapon = weaponCM.get(playerEntity);
-        SizeComponent playerSize = sizeCM.get(playerEntity);
-        ValidateAttackComponent playerValidationAttack = validateAttackCM.get(playerEntity);
-
-        PositionComponent demonPos = posCM.get(demonEntity);
-        SizeComponent demonSize = sizeCM.get(demonEntity);
-        DemonComponent demon = demonCM.get(demonEntity);
-
         this.leftRect = new Rectangle();
         this.demonRect = new Rectangle();
-
-        int collisionSpace = 15;
-        this.leftRect.set(demonPos.x - collisionSpace, demonPos.y, collisionSpace, demonSize.y);
-
-        playerValidationAttack.getAvailableSpace().add(leftRect);
     }
 
     @Override
     public void update(float delta) {
 
-        PlayerComponent player = playerCM.get(playerEntity);
-        PositionComponent playerPos = posCM.get(playerEntity);
-        WeaponComponent playerWeapon = weaponCM.get(playerEntity);
-        SizeComponent playerSize = sizeCM.get(playerEntity);
-        ValidateAttackComponent playerValidationAttack = validateAttackCM.get(playerEntity);
 
-        PositionComponent demonPos = posCM.get(demonEntity);
-        SizeComponent demonSize = sizeCM.get(demonEntity);
-        DemonComponent demon = demonCM.get(demonEntity);
+        for (int pi = 0; pi < playerEntity.size(); ++pi) {
 
+            Entity playerEntity = this.playerEntity.get(pi);
+            PlayerComponent player = playerCM.get(playerEntity);
+            PositionComponent playerPos = posCM.get(playerEntity);
+            WeaponComponent playerWeapon = weaponCM.get(playerEntity);
+            SizeComponent playerSize = sizeCM.get(playerEntity);
+            ValidateAttackComponent playerValidationAttack = validateAttackCM.get(playerEntity);
 
-        if (playerWeapon.getWeaponType().equals(WeaponType.MELEE)) {
+            PositionComponent demonPos = posCM.get(demonEntity);
+            SizeComponent demonSize = sizeCM.get(demonEntity);
+            DemonComponent demon = demonCM.get(demonEntity);
 
-            if (leftRect.contains(playerPos.x + (playerSize.x / 2), playerPos.y)) {
-                playerValidationAttack.setAvailableSpaceToAttack(true);
-            } else if (playerValidationAttack.isAvailableSpaceToAttack()) {
-                playerValidationAttack.setAvailableSpaceToAttack(false);
+            this.demonRect.set(demonPos.x, demonPos.y, demonSize.x, demonSize.y);
+
+            int collisionSpace = 15;
+            this.leftRect.set(demonPos.x - collisionSpace, demonPos.y, collisionSpace, demonSize.y);
+
+            if (playerWeapon.getWeaponType().equals(WeaponType.MELEE)) {
+
+                if (leftRect.contains(playerPos.x + (playerSize.x / 2), playerPos.y)) {
+                    playerValidationAttack.setInRange(true);
+                } else if (playerValidationAttack.isInRange()) {
+                    playerValidationAttack.setInRange(false);
+                }
             }
-        }
 
-        if (!level.isLevelStarted() && !level.isLevelComplete() && Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-            level.setLevelStarted(true);
+            //TODO need to check if nothing is in way of collision
+            //TODO if something appears then need to hit that object
+            //TODO can only fire when in range
+
+            if (playerWeapon.getWeaponType().equals(WeaponType.RANGED)) {
+
+                if (Intersector.intersectSegmentRectangle(playerValidationAttack.getCurrentPos(), playerValidationAttack.getTargetPos(), demonRect)) {
+                    playerValidationAttack.setInRange(true);
+                } else if (playerValidationAttack.isInRange()) {
+                    playerValidationAttack.setInRange(false);
+                }
+            }
+
+
+            if (!level.isLevelStarted() && !level.isLevelComplete() && Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+                level.setLevelStarted(true);
+            }
         }
     }
 }
