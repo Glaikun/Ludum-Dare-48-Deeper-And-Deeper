@@ -31,6 +31,7 @@ import com.glaikunt.framework.esc.component.player.AttackComponent;
 import com.glaikunt.framework.esc.component.player.PlayerComponent;
 import com.glaikunt.framework.esc.component.player.ValidateAttackComponent;
 import com.glaikunt.framework.esc.component.player.WeaponComponent;
+import com.glaikunt.framework.game.attack.FrostActor;
 import com.glaikunt.framework.game.enemy.DemonActor;
 import com.glaikunt.framework.game.weapon.WeaponType;
 
@@ -44,6 +45,7 @@ public class PlayerActor extends Actor {
     private HealthComponent health;
     private WeaponComponent weapon;
     private ValidateAttackComponent validateAttack;
+    private AttackComponent attack;
 
     private SizeComponent itemSize;
 
@@ -135,7 +137,7 @@ public class PlayerActor extends Actor {
         entity.add(validateAttack);
         entity.add(new VelocityComponent(100, 100));
         entity.add(player);
-        AttackComponent attack = new AttackComponent();
+        this.attack = new AttackComponent();
         attack.setAttackSpeed(new TickTimer(weapon.getWeaponType().getAttackSpeed()));
         attack.setDmg(weapon.getWeaponType().getDamage());
         entity.add(attack);
@@ -194,6 +196,15 @@ public class PlayerActor extends Actor {
                 notInRangeFont.draw(batch, pressSpaceToStartLayout, (Display.WORLD_WIDTH / 2) - (pressSpaceToStartLayout.width / 2), (Display.WORLD_HEIGHT) - (pressSpaceToStartLayout.height) - 10);
             }
         }
+
+        if (getWeapon().getWeaponType().equals(WeaponType.RANGED) && attack.isJustAttacked()) {
+
+            if (getStage() != null) {
+
+                getStage().addActor(new FrostActor(getApplicationResources(), getX() + (getWidth()/2), getY() + (getHeight()/2), new PositionComponent(validateAttack.getTargetPos().x, validateAttack.getTargetPos().y)));
+            }
+            attack.setJustAttacked(false);
+        }
     }
 
     @Override
@@ -201,6 +212,10 @@ public class PlayerActor extends Actor {
 
         if (healthDeltaWidth != (health.getDeltaHealth() / health.getHealth()) * healthMaxWidth) {
             healthDeltaWidth = (health.getDeltaHealth() / health.getHealth()) * healthMaxWidth;
+        }
+
+        if (health.getDeltaHealth() <= 0) {
+            remove();
         }
     }
 
@@ -231,6 +246,14 @@ public class PlayerActor extends Actor {
 
     public WeaponComponent getWeapon() {
         return weapon;
+    }
+
+    public float getHealthDeltaWidth() {
+        return healthDeltaWidth;
+    }
+
+    public HealthComponent getHealth() {
+        return health;
     }
 
     public ValidateAttackComponent getValidateAttack() {

@@ -1,6 +1,7 @@
 package com.glaikunt.framework.esc.component.game;
 
 import com.badlogic.ashley.core.Component;
+import com.glaikunt.framework.application.TickTimer;
 import com.glaikunt.framework.esc.component.player.GhostPlayerComponent;
 import com.glaikunt.framework.game.weapon.WeaponType;
 
@@ -15,6 +16,9 @@ public class LevelComponent implements Component {
 
     private boolean levelStarted = false;
     private boolean levelComplete = false;
+
+    private boolean gameOver = false;
+    private TickTimer gameOverTimer = new TickTimer(3);
 
     private List<GhostPlayerComponent> ghostPlayers = new LinkedList<>();
 
@@ -57,5 +61,21 @@ public class LevelComponent implements Component {
 
     public void setGhostPlayers(List<GhostPlayerComponent> ghostPlayers) {
         this.ghostPlayers = ghostPlayers;
+    }
+
+    public void setStage(float stage) {
+        this.stage = stage;
+    }
+
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
+    }
+
+    public TickTimer getGameOverTimer() {
+        return gameOverTimer;
     }
 }

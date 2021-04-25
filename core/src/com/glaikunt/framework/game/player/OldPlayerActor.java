@@ -23,6 +23,7 @@ import com.glaikunt.framework.esc.component.player.AttackComponent;
 import com.glaikunt.framework.esc.component.player.GhostPlayerComponent;
 import com.glaikunt.framework.esc.component.player.ValidateAttackComponent;
 import com.glaikunt.framework.esc.component.player.WeaponComponent;
+import com.glaikunt.framework.game.attack.FrostActor;
 import com.glaikunt.framework.game.enemy.DemonActor;
 import com.glaikunt.framework.game.weapon.WeaponType;
 
@@ -33,15 +34,18 @@ public class OldPlayerActor extends Actor {
 
     private WeaponComponent weapon;
     private HealthComponent health;
+    private AttackComponent attack;
+    private ValidateAttackComponent validateAttack;
 
     private float healthDeltaWidth;
     private float healthMaxWidth;
 
     private CollisionComponent collision;
 
-    public OldPlayerActor(ApplicationResources applicationResources, Vector2 pos, WeaponType weapon, DemonActor demonActor) {
+    public OldPlayerActor(ApplicationResources applicationResources, Vector2 pos, WeaponType weapon, DemonActor demonActor, HealthComponent health) {
         super(applicationResources);
 
+        this.health = health;
         this.playerTexture = new AnimationComponent(applicationResources.getCacheRetriever().geTextureCache(TextureCache.PLAYER_IDLE), 3, 1).getCurrentAnimation().getKeyFrames()[0];
 
         this.size = new SizeComponent(playerTexture.getRegionWidth() * 2, playerTexture.getRegionHeight() * 2);
@@ -51,9 +55,6 @@ public class OldPlayerActor extends Actor {
 
         this.healthTexture = applicationResources.getCacheRetriever().geTextureCache(TextureCache.SPOT);
 
-        this.health = new HealthComponent();
-        this.health.setHealth(5);
-
         this.healthMaxWidth = size.x;
         this.healthDeltaWidth = (health.getDeltaHealth() / health.getHealth()) * healthMaxWidth;
 
@@ -62,20 +63,25 @@ public class OldPlayerActor extends Actor {
         bound.set(pos.x + ((size.x/2)/2), pos.y, size.x/2, size.y/2);
         collision.setBound(bound);
 
+        this.validateAttack = new ValidateAttackComponent();
 
-        ValidateAttackComponent validateAttackComponent = new ValidateAttackComponent();
-        Rectangle hostPos = new Rectangle();
-        int collisionSpace = 15;
-        hostPos.set(demonActor.getX() - collisionSpace, demonActor.getY(), collisionSpace, demonActor.getHeight());
-        validateAttackComponent.setInRange(hostPos.contains(getX() + (getWidth() / 2), getY()));
+        if (this.weapon.getWeaponType().equals(WeaponType.MELEE)) {
+            Rectangle hostPos = new Rectangle();
+            int collisionSpace = 15;
+            hostPos.set(demonActor.getX() - collisionSpace, demonActor.getY(), collisionSpace, demonActor.getHeight());
+            validateAttack.setInRange(hostPos.contains(getX() + (getWidth() / 2), getY()));
+        } else {
+            validateAttack.getTargetPos().set(demonActor.getX() + (demonActor.getWidth()/2), demonActor.getY() + (demonActor.getHeight()/2));
+            validateAttack.setInRange(true);
+        }
 
         Entity entity = new Entity();
 
         entity.add(this.pos);
         entity.add(this.size);
-        entity.add(validateAttackComponent);
+        entity.add(validateAttack);
         entity.add(this.health);
-        AttackComponent attack = new AttackComponent();
+        this.attack = new AttackComponent();
         attack.setAttackSpeed(new TickTimer(weapon.getAttackSpeed()));
         attack.setDmg(weapon.getDamage());
         entity.add(attack);
@@ -89,7 +95,7 @@ public class OldPlayerActor extends Actor {
     @Override
     public void draw(Batch batch, float parentAlpha) {
 
-        batch.setColor(1, 1, 1, .8f);
+        batch.setColor(1, 1, 1, .6f);
         batch.draw(playerTexture, getX(), getY(), getWidth(), getHeight());
         batch.setColor(1, 1, 1, 1f);
 
@@ -102,6 +108,21 @@ public class OldPlayerActor extends Actor {
     public void act(float delta) {
 
         collision.getBound().set(pos.x + ((size.x/2)/2), pos.y, size.x/2, size.y/2);
+
+        if (weapon.getWeaponType().equals(WeaponType.RANGED) && attack.isJustAttacked()) {
+            if (getStage() != null) {
+                getStage().addActor(new FrostActor(getApplicationResources(), getX() + (getWidth()/2), getY() + (getHeight()/2), new PositionComponent(validateAttack.getTargetPos().x, validateAttack.getTargetPos().y)));
+            }
+            attack.setJustAttacked(false);
+        }
+
+        if (healthDeltaWidth != (health.getDeltaHealth() / health.getHealth()) * healthMaxWidth) {
+            healthDeltaWidth = (health.getDeltaHealth() / health.getHealth()) * healthMaxWidth;
+        }
+
+        if (health.getDeltaHealth() <= 0) {
+            remove();
+        }
     }
 
     @Override

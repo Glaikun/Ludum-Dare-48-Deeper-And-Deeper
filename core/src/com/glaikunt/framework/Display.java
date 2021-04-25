@@ -29,8 +29,8 @@ public class Display extends Game {
 	@Override
 	public void create () {
 
-//		Gdx.app.setLogLevel(DEBUG);
-		Gdx.app.setLogLevel(NONE);
+		Gdx.app.setLogLevel(DEBUG);
+//		Gdx.app.setLogLevel(NONE);
 
 		this.applicationResources = new ApplicationResources(this);
 
@@ -39,6 +39,7 @@ public class Display extends Game {
 		while(!applicationResources.getCacheRetriever().isCacheLoaded()) {
 			applicationResources.getCacheRetriever().update();
 		}
+		getApplicationResources().getAudioManager().init(getApplicationResources().getCacheRetriever().getSoundCache());
 
 		LevelComponent level = new LevelComponent();
 		getApplicationResources().getGlobalEntity().add(level);

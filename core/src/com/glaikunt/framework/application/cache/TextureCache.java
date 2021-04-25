@@ -12,6 +12,8 @@ public class TextureCache implements Cache {
     public static final String PLAYER_SITTING = "sprites/player_sitting_down.png";
     public static final String PLAYER_MOVEMENT = "sprites/player_movement.png";
 
+    public static final String HEART_ICON = "sprites/heart_icon.png";
+
     public static final String DEMON = "sprites/enemy.png";
 
     public static final String SPOT = "sprites/spot.png";
@@ -45,6 +47,7 @@ public class TextureCache implements Cache {
         add(assetManager, PLAYER_IDLE, PLAYER_SITTING, PLAYER_MOVEMENT);
         add(assetManager, DEMON);
         add(assetManager, SPOT);
+        add(assetManager, HEART_ICON);
         add(assetManager, NEXT_STAGE);
         add(assetManager, ATTACK_ICON, MAGIC_ICON, SUPPORT_ICON);
         add(assetManager, OVERLAY_1, OVERLAY_2, OVERLAY_3, OVERLAY_4, OVERLAY_5, OVERLAY_6, OVERLAY_7, OVERLAY_8, OVERLAY_9, OVERLAY_10);

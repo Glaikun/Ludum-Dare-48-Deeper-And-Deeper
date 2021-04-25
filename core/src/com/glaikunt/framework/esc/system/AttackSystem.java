@@ -72,12 +72,13 @@ public class AttackSystem extends EntitySystem {
 
                 if (playerVal.isInRange() && demonHealth.getLerpWidth() > 0 && playerAttack.getAttackSpeed().isTimerEventReady()) {
                     demonHealth.setLerpWidth(demonHealth.getLerpWidth() - playerWeapon.getWeaponType().getDamage());
+                    playerAttack.setJustAttacked(true);
                     demon.getHitDmg().add((int) (playerWeapon.getWeaponType().getDamage() * 10));
                 }
 
-                if (playerVal.isInRange() && !MathUtils.isEqual(demonHealth.getLerpWidth(), demonHealth.getDeltaHealth(), .5f)) {
+                if (!MathUtils.isEqual(demonHealth.getLerpWidth(), demonHealth.getDeltaHealth(), .5f)) {
                     demonHealth.setDeltaHealth(MathUtils.lerp(demonHealth.getDeltaHealth(), demonHealth.getLerpWidth(), 5 * delta));
-                }else if (demonHealth.getLerpWidth() != demonHealth.getDeltaHealth()) {
+                } else if (demonHealth.getLerpWidth() != demonHealth.getDeltaHealth()) {
                     demonHealth.setDeltaHealth(demonHealth.getLerpWidth());
                 }
 

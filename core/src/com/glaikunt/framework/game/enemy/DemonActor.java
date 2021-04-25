@@ -83,7 +83,7 @@ public class DemonActor extends Actor {
 
         this.attack = new AttackComponent();
         this.attack.setAttackSpeed(new TickTimer(1));
-        this.attack.setDmg(1);
+        this.attack.setDmg(1f);
 
         this.level = applicationResources.getGlobalEntity().getComponent(LevelComponent.class);
 
@@ -91,7 +91,6 @@ public class DemonActor extends Actor {
         Rectangle bound = new Rectangle();
         bound.set(pos.x, pos.y, size.x, size.y);
         collision.setBound(bound);
-
 
         Entity entity = new Entity();
 
@@ -111,7 +110,7 @@ public class DemonActor extends Actor {
 
         batch.draw(demonAnim.getCurrentFrame(), getX(), getY(), getWidth(), getHeight());
 
-        if (level.isLevelStarted()) {
+        if (level.isLevelStarted() && !level.isGameOver()) {
 
             batch.setColor(Color.RED);
             batch.draw(healthBarTexture, healthBarPos.x, healthBarPos.y, healthDeltaWidth, (healthBarSize.y * 2));
@@ -138,7 +137,7 @@ public class DemonActor extends Actor {
             IntMap.Entry<Container> next = i.next();
             Container label = next.value;
 
-            if (label.getColor().a <= .05f) {
+            if (label.getColor().a <= .1f) {
                 label.remove();
                 i.remove();
             }

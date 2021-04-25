@@ -11,7 +11,7 @@ public class DesktopLauncher {
 //		config.height = (int) (900 * .9f);
 		config.width = 640;
 		config.height = 480;
-		config.title = "Ludum Dare 48";
+		config.title = "Virtually Deeper";
 		config.resizable = false;
 		new LwjglApplication(new Display(), config);
 	}

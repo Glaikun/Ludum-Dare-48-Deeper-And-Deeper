@@ -8,12 +8,15 @@ import java.util.Map;
 
 public class SoundCache implements Cache {
 
+    public static final String MUSIC = "sound/game_lofi_tune.wav";
+
     private Map<String, Sound> sounds = new HashMap<>();
     private boolean loaded = false;
 
     @Override
     public void loadCache(AssetManager assetManager) {
 
+        add(assetManager, MUSIC);
     }
 
     @Override

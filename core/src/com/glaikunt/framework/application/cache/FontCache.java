@@ -11,6 +11,7 @@ public class FontCache implements Cache {
     public static final String SMALL_FONT = "font/button_font.fnt";
     public static final String BIG_FONT = "font/big_font.fnt";
     public static final String BATTLE_FONT = "font/battle_font.fnt";
+    public static final String GAME_FONT = "font/kenny_thick.fnt";
 
     private Map<String, BitmapFont> fonts = new HashMap<>();
     private boolean loaded = false;
@@ -20,6 +21,7 @@ public class FontCache implements Cache {
 
         add(SMALL_FONT, assetManager);
         add(BIG_FONT, assetManager);
+        add(GAME_FONT, assetManager);
         add(BATTLE_FONT, assetManager);
     }
 

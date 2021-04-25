@@ -8,6 +8,8 @@ public class AttackComponent implements Component {
     private TickTimer attackSpeed;
     private float dmg;
 
+    private boolean justAttacked;
+
     public TickTimer getAttackSpeed() {
         return attackSpeed;
     }
@@ -22,5 +24,13 @@ public class AttackComponent implements Component {
 
     public void setDmg(float dmg) {
         this.dmg = dmg;
+    }
+
+    public boolean isJustAttacked() {
+        return justAttacked;
+    }
+
+    public void setJustAttacked(boolean justAttacked) {
+        this.justAttacked = justAttacked;
     }
 }
