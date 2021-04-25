@@ -185,7 +185,7 @@ public class PlayerActor extends Actor {
         }
 
         batch.setColor(Color.RED);
-        batch.draw(healthTexture, getX(), getY() + getHeight() + healthTexture.getHeight() + 5, healthDeltaWidth, 5);
+        batch.draw(healthTexture, getX(), getY() + getHeight() + healthTexture.getHeight(), healthDeltaWidth, 5);
         batch.setColor(1, 1, 1, 1f);
 
         if (!level.isLevelStarted() ) {
@@ -216,6 +216,7 @@ public class PlayerActor extends Actor {
 
         if (health.getDeltaHealth() <= 0) {
             remove();
+            attack.setDead(true);
         }
     }
 

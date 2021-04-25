@@ -16,7 +16,8 @@ import com.glaikunt.framework.esc.component.player.WeaponComponent;
 
 public class AttackSystem extends EntitySystem {
 
-    private ImmutableArray<Entity> playerEntities, enemyEntities;
+    private ImmutableArray<Entity> playerEntities;
+    private Entity enemyEntity;
 
     private LevelComponent level;
 
@@ -36,21 +37,42 @@ public class AttackSystem extends EntitySystem {
                 ValidateAttackComponent.class,
                 AttackComponent.class
         ).get());
-        this.enemyEntities = applicationResources.getEngine().getEntitiesFor(Family.all(
+        this.enemyEntity = applicationResources.getEngine().getEntitiesFor(Family.all(
                 DemonComponent.class,
                 AttackComponent.class,
                 HealthComponent.class
-        ).get());
+        ).get())
+                .get(0);
         this.level = applicationResources.getGlobalEntity().getComponent(LevelComponent.class);
     }
 
     @Override
     public void update(float delta) {
 
-        if (!level.isLevelStarted() && !level.isLevelComplete()) {
+        DemonComponent demon = demonCM.get(enemyEntity);
+        HealthComponent demonHealth = healthCM.get(enemyEntity);
+        AttackComponent demonAttack = attackCM.get(enemyEntity);
+
+        if (demonAttack.getAttackSpeed().isTimerPassedTarget()) {
+            demonAttack.getAttackSpeed().resetTick();
+        }
+
+        if (!MathUtils.isEqual(demonHealth.getDeltaHealth(), demonHealth.getLerpWidth(), .01f)) {
+            demonHealth.setDeltaHealth(MathUtils.lerp(demonHealth.getDeltaHealth(), demonHealth.getLerpWidth(), 2.5f * delta));
+        } else {
+            demonHealth.setDeltaHealth(demonHealth.getLerpWidth());
+        }
+
+        if (!level.isLevelStarted() || level.isLevelComplete()) {
             return;
         }
 
+        if (demonHealth.getLerpWidth() <= 0 && MathUtils.isEqual(demonHealth.getLerpWidth(), demonHealth.getDeltaHealth(), 1)) {
+            level.setLevelComplete(true);
+            return;
+        }
+
+        demonAttack.getAttackSpeed().tick(delta);
         for (int pe = 0; pe < playerEntities.size(); ++pe) {
 
             Entity playerEntity = playerEntities.get(pe);
@@ -59,43 +81,32 @@ public class AttackSystem extends EntitySystem {
             ValidateAttackComponent playerVal = validateCM.get(playerEntity);
             AttackComponent playerAttack = attackCM.get(playerEntity);
 
+            if (playerAttack.isDead()) {
+                continue;
+            }
+
             playerAttack.getAttackSpeed().tick(delta);
 
-            for (int ee = 0; ee < enemyEntities.size(); ++ee) {
-
-                Entity enemyEntity = enemyEntities.get(ee);
-                DemonComponent demon = demonCM.get(enemyEntity);
-                HealthComponent demonHealth = healthCM.get(enemyEntity);
-                AttackComponent demonAttack = attackCM.get(enemyEntity);
-
-                demonAttack.getAttackSpeed().tick(delta);
-
-                if (playerVal.isInRange() && demonHealth.getLerpWidth() > 0 && playerAttack.getAttackSpeed().isTimerEventReady()) {
-                    demonHealth.setLerpWidth(demonHealth.getLerpWidth() - playerWeapon.getWeaponType().getDamage());
-                    playerAttack.setJustAttacked(true);
-                    demon.getHitDmg().add((int) (playerWeapon.getWeaponType().getDamage() * 10));
+            if (playerVal.isInRange() && demonHealth.getLerpWidth() > 0 && playerAttack.getAttackSpeed().isTimerEventReady()) {
+                demonHealth.setLerpWidth(demonHealth.getLerpWidth() - playerWeapon.getWeaponType().getDamage());
+                if (demonHealth.getLerpWidth() < 0) {
+                    demonHealth.setLerpWidth(0);
                 }
+                playerAttack.setJustAttacked(true);
+                demon.getHitDmg().add((int) (playerWeapon.getWeaponType().getDamage() * 10));
+            }
 
-                if (!MathUtils.isEqual(demonHealth.getLerpWidth(), demonHealth.getDeltaHealth(), .5f)) {
-                    demonHealth.setDeltaHealth(MathUtils.lerp(demonHealth.getDeltaHealth(), demonHealth.getLerpWidth(), 5 * delta));
-                } else if (demonHealth.getLerpWidth() != demonHealth.getDeltaHealth()) {
-                    demonHealth.setDeltaHealth(demonHealth.getLerpWidth());
+            if (playerHealth.getLerpWidth() > 0 && demonAttack.getAttackSpeed().isTimerPassedTarget()) {
+                playerHealth.setLerpWidth(playerHealth.getLerpWidth() - demonAttack.getDmg());
+                if (playerHealth.getLerpWidth() < 0) {
+                    playerHealth.setLerpWidth(0);
                 }
+            }
 
-                if (playerHealth.getLerpWidth() > 0 && demonAttack.getAttackSpeed().isTimerEventReady()) {
-                    playerHealth.setLerpWidth(playerHealth.getLerpWidth() - demonAttack.getDmg());
-                }
-
-                if (!MathUtils.isEqual(playerHealth.getLerpWidth(), playerHealth.getDeltaHealth(), .5f)) {
-                    playerHealth.setDeltaHealth(MathUtils.lerp(playerHealth.getDeltaHealth(), playerHealth.getLerpWidth(), 5 * delta));
-                } else if (playerHealth.getLerpWidth() != playerHealth.getDeltaHealth()) {
-                    playerHealth.setDeltaHealth(playerHealth.getLerpWidth());
-                }
-
-                if (demonHealth.getLerpWidth() <= 0 && MathUtils.isEqual(demonHealth.getLerpWidth(), demonHealth.getDeltaHealth(), 1) ) {
-                    level.setLevelComplete(true);
-                    return;
-                }
+            if (!MathUtils.isEqual(playerHealth.getLerpWidth(), playerHealth.getDeltaHealth(), .01f)) {
+                playerHealth.setDeltaHealth(MathUtils.lerp(playerHealth.getDeltaHealth(), playerHealth.getLerpWidth(), 2.5f * delta));
+            } else if (playerHealth.getLerpWidth() != playerHealth.getDeltaHealth()) {
+                playerHealth.setDeltaHealth(playerHealth.getLerpWidth());
             }
         }
     }

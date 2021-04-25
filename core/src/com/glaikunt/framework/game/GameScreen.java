@@ -66,7 +66,7 @@ public class GameScreen extends Screen {
 
         for (Iterator<GhostPlayerComponent> i = level.getGhostPlayers().iterator(); i.hasNext(); ) {
             GhostPlayerComponent ghostPlayerComponent = i.next();
-            if (ghostPlayerComponent.getHealth().getDeltaHealth() <= 0) {
+            if (ghostPlayerComponent.getHealth().getDeltaHealth() <= 0 || (player.getX() == ghostPlayerComponent.getPos().x && player.getY() == ghostPlayerComponent.getPos().y)) {
                 i.remove();
             } else {
                 getFront().addActor(new OldPlayerActor(getApplicationResources(), ghostPlayerComponent.getPos(), ghostPlayerComponent.getWeapon(), demon, ghostPlayerComponent.getHealth()));
@@ -127,35 +127,44 @@ public class GameScreen extends Screen {
 
         if (level.isLevelComplete()) {
 
-            GhostPlayerComponent ghostPlayer = new GhostPlayerComponent();
+            level.getLevelCompleteTimer().tick(delta);
 
-            ghostPlayer.setPos(new PositionComponent(player.getX(), player.getY()));
-            ghostPlayer.setWeapon(player.getWeapon().getWeaponType());
-            ghostPlayer.setHealth(player.getHealth());
+            if (level.getLevelCompleteTimer().isTimerEventReady()) {
 
-            level.getGhostPlayers().add(ghostPlayer);
+                GhostPlayerComponent ghostPlayer = new GhostPlayerComponent();
 
-            getDisplay().setScreen(new SplashScreen(getApplicationResources()));
-        }
+                ghostPlayer.setPos(new PositionComponent(player.getX(), player.getY()));
+                ghostPlayer.setWeapon(player.getWeapon().getWeaponType());
+                ghostPlayer.setHealth(player.getHealth());
 
-        foundPlayerType = false;
-        for (Actor actor : getFront().getActors()) {
+                level.getGhostPlayers().add(ghostPlayer);
 
-            if (actor instanceof OldPlayerActor || actor instanceof PlayerActor) {
-                foundPlayerType = true;
+                getDisplay().setScreen(new SplashScreen(getApplicationResources()));
             }
         }
 
-        if (level.isGameOver()) {
-            level.getGameOverTimer().tick(delta);
+        if (level.isLevelStarted() && !level.isLevelComplete()) {
 
-            if (level.getGameOverTimer().isTimerEventReady()) {
-                getDisplay().setScreen(new CreditScreen(getApplicationResources()));
+            foundPlayerType = false;
+            for (Actor actor : getFront().getActors()) {
+
+                if (actor instanceof OldPlayerActor || actor instanceof PlayerActor) {
+                    foundPlayerType = true;
+                    break;
+                }
             }
-        }
 
-        if (!foundPlayerType) {
-            level.setGameOver(true);
+            if (level.isGameOver()) {
+                level.getGameOverTimer().tick(delta);
+
+                if (level.getGameOverTimer().isTimerEventReady()) {
+                    getDisplay().setScreen(new CreditScreen(getApplicationResources()));
+                }
+            }
+
+            if (!foundPlayerType) {
+                level.setGameOver(true);
+            }
         }
     }
 

@@ -51,7 +51,7 @@ public class PlayerMovementSystem extends EntitySystem {
     @Override
     public void update(float delta) {
 
-        if (level.isLevelStarted() && !level.isLevelComplete()) {
+        if (level.isLevelStarted() || level.isLevelComplete()) {
             return;
         }
 

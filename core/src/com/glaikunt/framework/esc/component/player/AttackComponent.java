@@ -7,6 +7,7 @@ public class AttackComponent implements Component {
 
     private TickTimer attackSpeed;
     private float dmg;
+    private boolean dead;
 
     private boolean justAttacked;
 
@@ -32,5 +33,13 @@ public class AttackComponent implements Component {
 
     public void setJustAttacked(boolean justAttacked) {
         this.justAttacked = justAttacked;
+    }
+
+    public boolean isDead() {
+        return dead;
+    }
+
+    public void setDead(boolean dead) {
+        this.dead = dead;
     }
 }

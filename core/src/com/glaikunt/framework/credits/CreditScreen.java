@@ -52,14 +52,14 @@ public class CreditScreen extends Screen {
 
         credits.add(new CreditTextActor(getApplicationResources(), "Game Over"));
         credits.add(new CreditTextActor(getApplicationResources(), "You Got To Stage"));
-        credits.add(new CreditTextActor(getApplicationResources(), getApplicationResources().getGlobalEntity().getComponent(LevelComponent.class).getStage() + ""));
+        credits.add(new CreditTextActor(getApplicationResources(), (int) getApplicationResources().getGlobalEntity().getComponent(LevelComponent.class).getStage() + ""));
 
         credits.add(new CreditTextActor(getApplicationResources(), "    "));
 
         credits.add(new CreditTextActor(getApplicationResources(), "Created By"));
         credits.add(new CreditTextActor(getApplicationResources(), "Glaikunt"));
 
-        String message = "Thanks For Playing!  \n\n";
+        String message = "Thanks For Playing!\n\n           Stage: " + (int) getApplicationResources().getGlobalEntity().getComponent(LevelComponent.class).getStage();
         getFront().addActor(new TopTextActor(getApplicationResources(), message));
     }
 

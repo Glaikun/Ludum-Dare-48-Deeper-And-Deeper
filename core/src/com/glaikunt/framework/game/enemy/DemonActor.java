@@ -81,11 +81,11 @@ public class DemonActor extends Actor {
         this.hitFont = applicationResources.getCacheRetriever().getFontCache(FontCache.BATTLE_FONT);
         this.hitFont.getRegion().flip(true, false);
 
+        this.level = applicationResources.getGlobalEntity().getComponent(LevelComponent.class);
+
         this.attack = new AttackComponent();
         this.attack.setAttackSpeed(new TickTimer(1));
-        this.attack.setDmg(1f);
-
-        this.level = applicationResources.getGlobalEntity().getComponent(LevelComponent.class);
+        this.attack.setDmg(.25f + (.1f * level.getStage()));
 
         this.collision = new CollisionComponent();
         Rectangle bound = new Rectangle();

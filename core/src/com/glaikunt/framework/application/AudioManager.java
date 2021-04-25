@@ -5,7 +5,7 @@ import com.glaikunt.framework.application.cache.SoundCache;
 
 public class AudioManager {
 
-    private float volume = 1;
+    private float volume = 0;
 
     private Sound gameMusic;
 

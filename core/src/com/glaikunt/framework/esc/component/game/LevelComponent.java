@@ -16,6 +16,7 @@ public class LevelComponent implements Component {
 
     private boolean levelStarted = false;
     private boolean levelComplete = false;
+    private TickTimer levelCompleteTimer = new TickTimer(3);
 
     private boolean gameOver = false;
     private TickTimer gameOverTimer = new TickTimer(3);
@@ -77,5 +78,9 @@ public class LevelComponent implements Component {
 
     public TickTimer getGameOverTimer() {
         return gameOverTimer;
+    }
+
+    public TickTimer getLevelCompleteTimer() {
+        return levelCompleteTimer;
     }
 }

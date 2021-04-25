@@ -100,7 +100,7 @@ public class OldPlayerActor extends Actor {
         batch.setColor(1, 1, 1, 1f);
 
         batch.setColor(Color.RED);
-        batch.draw(healthTexture, getX(), getY() + getHeight() + healthTexture.getHeight() + 5, healthDeltaWidth, 5);
+        batch.draw(healthTexture, getX(), getY() + getHeight() + healthTexture.getHeight(), healthDeltaWidth, 5);
         batch.setColor(1, 1, 1, 1f);
     }
 
@@ -122,6 +122,7 @@ public class OldPlayerActor extends Actor {
 
         if (health.getDeltaHealth() <= 0) {
             remove();
+            attack.setDead(true);
         }
     }
 

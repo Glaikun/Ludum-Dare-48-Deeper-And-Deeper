@@ -60,6 +60,9 @@ public class PlayerActionsSystem extends EntitySystem {
     @Override
     public void update(float delta) {
 
+        if (level.isLevelStarted() || level.isLevelComplete()) {
+            return;
+        }
 
         for (int pi = 0; pi < playerEntity.size(); ++pi) {
 

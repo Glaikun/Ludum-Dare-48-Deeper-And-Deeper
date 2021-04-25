@@ -29,8 +29,10 @@ public class Display extends Game {
 	@Override
 	public void create () {
 
-		Gdx.app.setLogLevel(DEBUG);
-//		Gdx.app.setLogLevel(NONE);
+//		Gdx.app.setLogLevel(DEBUG);
+		Gdx.app.setLogLevel(NONE);
+
+		Gdx.graphics.setTitle("Virtually Deeper");
 
 		this.applicationResources = new ApplicationResources(this);
 
